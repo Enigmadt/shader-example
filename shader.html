@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        
+        <style>
+            body {
+            font-family: Monospace;
+            background-color: #000000;
+            margin: 0px;
+            overflow: hidden;
+            }
+
+          
+        </style>
+        <title>WebGl</title>
+
+    
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js" ></script>
+        <script src="js/Three.js"></script>
+        
+        
+       <script type="x-shader/x-vertex" id="vertexshader">
+
+            varying vec3 vNormal;
+            varying vec3 vPosition;
+            varying float vNoise;
+            varying vec3 vTangent;
+            varying vec3 vBinormal;
+ 
+            varying vec3 tsPosition;
+            varying vec3 tsCameraPosition;
+            varying vec3 tsLightSource;
+
+            //attribute vec3 normal;
+            attribute vec4 tangent;
+            attribute vec2 texCoord;
+
+            varying vec2 vUv;
+            varying float time1;
+            
+            uniform sampler2D texture0;
+            uniform sampler2D texture1;
+            uniform sampler2D texture2;
+            uniform sampler2D texture3;
+            uniform sampler2D texture4;
+            uniform float uscale;
+            uniform float time;
+
+
+            const float persist = 0.0565;
+            float persistence = 1.0;
+            const int oktave = 4;
+            float h = 0.0;
+
+            vec4 gpuGetCell3D(float x, const int y, const int z)
+            {
+                float u = (x + y * 31.0) / 256.0;
+                float v = (z - x * 31.0) / 256.0;
+                return (textured2D(texture0, vec2(u,v)));
+            }
+            
+            
+     
+
+            void main() {
+                
+                vNormal = normal;
+                vUv = uv*8000.0;
+                vPosition = position;
+                time1 = time;
+
+                
+                float noise,temp=3000.0;
+                
+                noise gpuGetCell3D(1.0,1.0,1.0);
+                
+          
+                vNoise = noise;
+                vec3 noisefaktor = vec3(noise*0.0515);
+                if(noise < 0.0) {noisefaktor = vec3(0.0); }
+                
+                vec3 newPosition = position + normal * noisefaktor;
+                gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition,1.0 );
+
+                
+
+            }
+
+        </script>
+
+       <script type="x-shader/x-fragment" id="fragmentshader">
+        
+            varying vec3 vNormal;
+            varying vec3 vPosition;
+            varying float vNoise;
+            varying vec2 vUv;
+            uniform sampler2D texture0;
+            uniform sampler2D texture1;
+            uniform sampler2D texture2;
+            uniform sampler2D texture3;
+            uniform sampler2D texture4;
+            uniform sampler2D grass1;
+
+            varying vec3 tsPosition;
+            varying vec3 tsCameraPosition;
+            varying vec3 tsLightSource;
+            varying float time1;
+
+            uniform vec3 ambientColor; // color of ambient light
+            uniform vec3 diffuseColor; // color of diffuse lighting
+            uniform vec3 specularColor; // color of specular highlights
+            uniform float shininess; // how shiny the surface is
+            uniform vec2 scaleBias; // x = scale, y = bias
+
+            void main() {
+
+                vec4 mycolor,
+                    mc0 = texture2D(texture0,vUv), //Wasser
+                    mc1 = texture2D(texture1,vUv), //Sand
+                    mc2 = texture2D(texture2,vUv), //Gras
+                    mc3 = texture2D(texture3,vUv), //Fels
+                    mc4 = texture2D(texture4,vUv); //Schnee
+                 float   wasserc=1.0,
+                    sandc=1.0,
+                    grasc=1.0,
+                    felsc=1.0,
+                    schneec=1.0;
+                    
+                
+
+                if( vNoise < -0.1 ) { mycolor = mix(mc0,mc1,vNoise); } //wasser
+                if( vNoise < 0.0)   { mycolor = mix(mc0,mc1,vNoise); } //Wasser sand
+                if( vNoise >= 0.0 ) {  } //Sand
+                if( vNoise > 0.05 ) { mycolor = mix(mc1,mc2,vNoise); } //Sand Gras
+                if( vNoise > 0.08 ) {  } //Gras
+                if( vNoise > 0.28 ) {  } //Fels
+                if( vNoise > 0.65 ) { mycolor = mix(mc3,mc4,vNoise); } //Fels Schnee
+                if( vNoise > 0.7 )  {  } //Schnee
+                
+                mycolor = mix(mc0,mc1,vNoise);// + mc2 + mc3 + mc4;
+                
+               /* 
+                // calculate the UV offset
+                float height = texture2D(texture3, vUv).a;
+                float v = height * scaleBias.r - scaleBias.g;
+ 
+                // normalize the camera's tangent space position
+                vec3 eye = normalize(tsCameraPosition);
+
+                vec2 newCoords = vUv + (eye.xy * v);
+ 
+                vec3 color = texture2D(texture3, newCoords).rgb; // default color
+                vec3 normal = texture2D(texture3, newCoords).rgb * 2.0 - 1.0;
+ 
+                // normalize the other tangent space vectors
+                vec3 viewVector = normalize(tsCameraPosition - tsPosition);
+                //vec3 lightVector = normalize(tsLightSource - tsPosition);
+ 
+                // calculate lighting values
+                //float nxDir = max(0.0, dot(normal, lightVector));
+                vec3 ambient = ambientColor * mycolor.rgb;
+*/
+		
+                gl_FragColor = mycolor;
+            }
+
+        </script>
+
+
+
+        <script  type="text/javascript" >
+            
+
+            var camera, scene, renderer,
+                mouse = { X: 0, y: 0 },
+                scene = new THREE.Scene(),
+                camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000000000000),
+                light = new THREE.PointLight(0x8a4522, 3, 1000);
+            scene.add(camera);
+            
+
+            renderer = new THREE.WebGLRenderer( { clearColor: 0x000000,antialias: true }); //  CanvasRenderer();
+            renderer.setSize(window.innerWidth - 50, window.innerHeight - 50);
+
+            controls = new THREE.TrackballControls(camera);
+            controls.enabled = true;
+            controls.rotateSpeed = 1.0;
+            controls.zoomSpeed = 1.2;
+            controls.panSpeed = 0.2;
+            controls.noZoom = false;
+            controls.noPan = false;
+            controls.staticMoving = false;
+            controls.dynamicDampingFactor = 0.3;
+            controls.minDistance = 1.1;
+            controls.maxDistance = 2000000000000;
+            controls.keys = [65, 83, 68];
+            controls.target = new THREE.Vector3(-20000,0,0);
+            
+
+
+            // licht einschalten -----------------------
+            light.position = new THREE.Vector3(0, 5, -5);
+            scene.add(light);
+
+            var ambilight = new THREE.AmbientLight(0xbbbbbb);
+            scene.add(ambilight);
+            
+                       
+
+            attributes = {
+                displacement: {
+                size: { type: 'f', value: [] },
+                customColor: { type: 'c', value: [] }
+                }
+            };
+
+            
+            uniforms = {
+                time: {type: "f", value: 0},
+                uscale: { type: "f", value: 100.0 },
+                ambientColor: { type: "vec3", value:(0.0,0.0,1.0) },
+                diffuseColor: { type: "vec3", value:(0.5,0.5,0.5) },
+                SpecularColor: { type: "vec", value:(0.5,0.5,0.5) },
+                shininess: { type: "f", value: 0.5 },
+                scaleBias: { type: "vec2", value:(1.0,0.5) },
+                texture0: { type: "t", value: 0, texture: THREE.ImageUtils.loadTexture( "images/wasser.PNG" ) },
+                texture1: { type: "t", value: 1, texture: THREE.ImageUtils.loadTexture( "images/sand.PNG" ) },
+                texture2: { type: "t", value: 2, texture: THREE.ImageUtils.loadTexture( "images/grass.PNG" ) },
+                texture3: { type: "t", value: 3, texture: THREE.ImageUtils.loadTexture( "images/fels1.png" ) },
+                texture4: { type: "t", value: 4, texture: THREE.ImageUtils.loadTexture( "images/schnee.PNG" ) },
+                grass1: { type: "t", value: 5, texture: THREE.ImageUtils.loadTexture( "images/grass1.PNG" ) }
+              
+            };
+           
+            uniforms.texture0.texture.wrapS = uniforms.texture0.texture.wrapT = THREE.RepeatWrapping;
+            uniforms.texture1.texture.wrapS = uniforms.texture1.texture.wrapT = THREE.RepeatWrapping;
+            uniforms.texture2.texture.wrapS = uniforms.texture2.texture.wrapT = THREE.RepeatWrapping;
+            uniforms.texture3.texture.wrapS = uniforms.texture3.texture.wrapT = THREE.RepeatWrapping;
+            uniforms.texture4.texture.wrapS = uniforms.texture4.texture.wrapT = THREE.RepeatWrapping;
+                        
+            camera.position.set(-20050,0,0)
+            
+
+            var vShader = $("#vertexshader");
+            var fShader = $("#fragmentshader");
+
+            scene.add(new THREE.Mesh(new THREE.OctahedronGeometry(20000,6),new THREE.ShaderMaterial({wireframe:false, uniforms: uniforms, vertexShader: vShader.text(), fragmentShader: fShader.text() }) ));
+            //scene.add(new THREE.Mesh(new THREE.OctahedronGeometry(20000,6),new THREE.MeshBasicMaterial({color:0x0000ff, wireframe:true}) ));
+	    var cubegeo = new THREE.CubeGeometry(1,1,1,2,2,2),
+                cubemat = new THREE.MeshBasicMaterial({}),
+                cube = new THREE.Mesh(cubegeo,cubemat);
+		scene.add(cube);
+                cube.position.set(-20000.5,0,0);
+                cube.scale.set(1,1,1);
+                
+            var size = 1.51, length = 60000,pfeilgroese = 5000;
+        
+            function v(x,y,z){ 
+                return new THREE.Vertex(new THREE.Vector3(x,y,z)); 
+            }
+
+            var lineGeor = new THREE.Geometry(),
+                lineGeog = new THREE.Geometry(),
+                lineGeob = new THREE.Geometry();
+                
+            lineGeor.vertices.push(v(-length, 0, 0), v(length, 0, 0),v(length-pfeilgroese, 0, pfeilgroese),v(length-pfeilgroese, 0, -pfeilgroese),v(length, 0, 0) ); 
+            lineGeog.vertices.push(v(0, -length, 0), v(0, length, 0) );
+            lineGeob.vertices.push(v(0, 0, -length), v(0, 0, length) );
+            
+            var lineMatr = new THREE.LineBasicMaterial({color: 0xff0000, lineWidth: size});
+            var lineMatg = new THREE.LineBasicMaterial({color: 0x00ff00, lineWidth: size});
+            var lineMatb = new THREE.LineBasicMaterial({color: 0x0000ff, lineWidth: size});
+            
+            var liner = new THREE.Line(lineGeor, lineMatr),
+                lineg = new THREE.Line(lineGeog, lineMatg),
+                lineb = new THREE.Line(lineGeob, lineMatb);
+                
+           // line.type = THREE.Lines;
+            scene.add(liner);scene.add(lineg);scene.add(lineb);
+
+
+            //################### Kamera Steuerung #####################################
+
+            var CameraAbstand = 30, 
+                CameraDrehGeschwindigkeit = 0.4, 
+                CameraTarget = new THREE.Vector3(0, 0, 0),
+                MouseDown = 0,
+                oldMouseX = 0,
+                oldMouseY = 0,
+                moveX = 0,
+                moveY = 0;
+
+
+            var rotateStart = new THREE.Vector3(),
+                rotateEnd = new THREE.Vector3(),
+                eye = new THREE.Vector3();
+
+
+            //document.addEventListener("mousemove", CameraControllMouseMove, false);
+            //document.addEventListener("mousedown", CameraControlMouseDown, false);
+            //document.addEventListener("mouseup", CameraControlMouseUp, false);
+            //window.addEventListener('DOMMouseScroll', CameraControlMouseWheel, false);
+            var moveto = 0;
+            function CameraControllMouseMove(event) {
+                event.preventDefault();
+                
+
+
+                
+                if (MouseDown === 1) {
+
+                    moveto = 1;
+
+                    window.mouse.X = ((event.clientX/ window.innerWidth) * 2 - 1);
+                    window.mouse.Y = -((event.clientY / window.innerHeight) * 2 + 1);
+
+                    //camera.position.z = Math.sin(mouse.X ) * Math.sin(mouse.Y ) * CameraAbstand;
+                   // camera.position.x = Math.cos(mouse.X ) * CameraAbstand;
+                   // camera.position.y = Math.cos(mouse.Y ) * CameraAbstand;
+                    
+                }
+
+            }
+
+            function CameraControlMouseDown(event) {
+                event.preventDefault();
+                
+                if (event.button === 2) {
+                    MouseDown = 1;
+                }
+            }
+            function CameraControlMouseUp(event) {
+                event.preventDefault();
+                if(event.button === 1){
+                    MouseDown = 0;
+                 
+                }
+            }
+            function CameraControlMouseWheel(event) {
+                event.preventDefault();
+                $("#mouse").text(CameraAbstand);
+                if (CameraAbstand + event.detail / 3 > 0) CameraAbstand = CameraAbstand + event.detail / 3;
+
+            }
+
+
+            //#################### Kamera Steuerung ENDE ################################
+           
+            function initalize() {
+                //ui();
+                           
+                    
+                document.body.appendChild(renderer.domElement);
+
+                animate();
+            }
+
+
+            var winkel = 0;
+            function animate() {
+                
+                requestAnimationFrame(animate);
+                
+                winkel = (winkel+1) % 360
+                var time = parseFloat(Date.now());
+                uniforms.time.value = winkel;
+                $("#mouse").text(winkel);
+                uniforms.uscale.value = camera.position.distanceTo(new THREE.Vector3(0,0,0));               
+                render();
+            }
+
+
+            function render() {
+            
+                
+
+                //camera.position.x += 0.1;
+                // camera.lookAt(CameraTarget);
+                //particleSystem.rotation.y -= 0.00051 % 360
+                
+                
+                if (moveto == 1) {
+
+                    if (camera.position.distanceTo(new THREE.Vector3(0, 0, 10000000)) <= 10) {
+
+                        //moveto = 0;
+                    }
+                    else {
+                       //camera.translateZ(-camera.position.distanceTo(new THREE.Vector3(0, 0, 3000000000))/5 );
+                    }
+                    
+                }
+            
+                controls.update();
+
+                renderer.clear();
+                renderer.render(scene, camera);
+            }
+
+        
+        </script>
+
+        <script type="text/javascript" >
+
+            function ui() {
+
+                $("#button").click(function () {
+
+                    var PSpiralForm = parseFloat($("#spiralForm").val()),
+                        PRauschen = parseFloat($("#rauschen").val()),
+                        PSchritweite = parseFloat($("#schritweiteEntfernung").val()),
+                        PEntfernung = parseFloat($("#entfernung").val()),
+                        PSpiralarmabstand = parseFloat($("#spiralabstand").val()),
+                        PAnzahlParticle = parseFloat($("#AnzahlParticle").val());
+
+                    createGalaxy(PSpiralForm, PRauschen, PSchritweite, PEntfernung, PSpiralarmabstand, PAnzahlParticle);
+                });
+            }
+        </script>
+        
+        </head>
+    
+    <body  onload="initalize();" >
+        <div style="position:absolute;background:#dcdcdc;width:200px;visibility:visible" id="mouse" >
+     <!--
+        <input type=text value="0.021" id="spiralForm" /> SpiralForm
+        <input type=text value="0.2" id="rauschen" /> Rauschen
+        <input type=text value="1" id="schritweiteEntfernung" /> Schritweite
+        <input type=text value="50000000" id="entfernung" /> Entfernung
+        <input type=text value="0.225" id="spiralabstand" /> Spiralarmabstand
+        <input type=text value="26007" id="AnzahlParticle" /> AnzahlParticle
+        <input type="button" id="button" value="los" />
+     -->
+
+    </div>
+    </body >
+  
+</html>
