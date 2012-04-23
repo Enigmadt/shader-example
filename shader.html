@@ -57,7 +57,7 @@
             {
                 float u = (x + y * 31.0) / 256.0;
                 float v = (z - x * 31.0) / 256.0;
-                return (textured2D(texture0, vec2(u,v)));
+                return (texture2D(texture0, vec2(u,v)));
             }
             
             
@@ -73,7 +73,7 @@
                 
                 float noise,temp=3000.0;
                 
-                noise gpuGetCell3D(1,1,1);
+                noise = -1.0;
                 
           
                 vNoise = noise;
