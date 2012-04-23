@@ -53,7 +53,7 @@
             const int oktave = 4;
             float h = 0.0;
 
-            vec4 gpuGetCell3D(float x, const int y, const int z)
+            vec4 gpuGetCell3D(float x, const float y, float z)
             {
                 float u = (x + y * 31.0) / 256.0;
                 float v = (z - x * 31.0) / 256.0;
@@ -73,7 +73,7 @@
                 
                 float noise,temp=3000.0;
                 
-                noise gpuGetCell3D(1.0,1.0,1.0);
+                noise gpuGetCell3D(1,1,1);
                 
           
                 vNoise = noise;
