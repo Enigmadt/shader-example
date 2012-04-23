@@ -9,7 +9,7 @@
             margin: 0px;
             overflow: hidden;
             }
-            
+
           
         </style>
         <title>WebGl</title>
@@ -62,7 +62,7 @@
             
             
      
-                //test
+
             void main() {
                 
                 vNormal = normal;
@@ -140,27 +140,6 @@
                 
                 mycolor = mix(mc0,mc1,vNoise);// + mc2 + mc3 + mc4;
                 
-               /* 
-                // calculate the UV offset
-                float height = texture2D(texture3, vUv).a;
-                float v = height * scaleBias.r - scaleBias.g;
- 
-                // normalize the camera's tangent space position
-                vec3 eye = normalize(tsCameraPosition);
-
-                vec2 newCoords = vUv + (eye.xy * v);
- 
-                vec3 color = texture2D(texture3, newCoords).rgb; // default color
-                vec3 normal = texture2D(texture3, newCoords).rgb * 2.0 - 1.0;
- 
-                // normalize the other tangent space vectors
-                vec3 viewVector = normalize(tsCameraPosition - tsPosition);
-                //vec3 lightVector = normalize(tsLightSource - tsPosition);
- 
-                // calculate lighting values
-                //float nxDir = max(0.0, dot(normal, lightVector));
-                vec3 ambient = ambientColor * mycolor.rgb;
-*/
 		
                 gl_FragColor = mycolor;
             }
