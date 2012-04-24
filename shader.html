@@ -76,7 +76,6 @@
             uniform sampler2D texture2;
             uniform sampler2D texture3;
             uniform sampler2D texture4;
-            uniform sampler2D grass1;
             uniform sampler2D heightMap;
            
 
@@ -90,7 +89,7 @@
             uniform float shininess; // how shiny the surface is
             uniform vec2 scaleBias; // x = scale, y = bias
             
-            const float persist = 1.58515;
+            const float persist = 0.388515;
             float persistence = 1.0;
             const int frequenz = 4;
             float h = 0.0;
@@ -261,12 +260,13 @@
                             }
             void main() {
             float vNoise;
-                for(int i=0; i< frequenz; i++){
+            
+                for(int i=0; i < frequenz; i++){
                     vNoise = cnoise(vec3(vUv.x,vUv.y,1.0)* persistence);
-                    persistence += persist;
+                    persistence *= persist;
                 }
                 vec4 mycolor;
-                int i=0;
+              
                 float interpolate = vNoise+0.50;
 
                 if( vNoise < -0.1 ) { mycolor = texture2D(texture0, vUv );  }
@@ -326,9 +326,9 @@
             light.castShadow = true;
             scene.add(light);
 
-            //var ambilight = new THREE.AmbientLight(0xffffff);
-            //scene.add(ambilight);
-       
+            var ambilight = new THREE.AmbientLight(0xffffff);
+            scene.add(ambilight);
+            
                        
 
             attributes = {
@@ -363,21 +363,21 @@
             uniforms.heightMap.texture.wrapS = uniforms.heightMap.texture.wrapT = THREE.RepeatWrapping;
                         
             camera.position.z = 851000;
+            //controls.target = new THREE.Vector3(851000, 0, 0);
             
-
             var vShader = $("#vertexshader");
             var fShader = $("#fragmentshader");
-            var scale=80000, detail=6,
+            var scale=80000, detail=4,
             
-                meshgeo = [[new THREE.IcosahedronGeometry(scale,detail),        scale*2],
-                            [new THREE.IcosahedronGeometry(scale,detail-1),     scale*3],
+                meshgeo = [[new THREE.IcosahedronGeometry(scale,detail),        scale*1.5],
+                            [new THREE.IcosahedronGeometry(scale,detail-1),     scale*4],
                             [new THREE.IcosahedronGeometry(scale,detail-2),    scale*8],
-                            [new THREE.IcosahedronGeometry(scale,detail-3),   scale*10],
-                            [new THREE.IcosahedronGeometry(scale,detail-4),  scale*12],
-                            [new THREE.IcosahedronGeometry(scale,detail-5),  scale*15]
+                            [new THREE.IcosahedronGeometry(scale,detail-3),   scale*15],
+                            [new THREE.IcosahedronGeometry(scale,detail-3),  scale*20],
+                            [new THREE.IcosahedronGeometry(scale,detail-3),  scale*25]
                             ],
                 meshmat=new THREE.ShaderMaterial({ wireframe: false, smooth: true, uniforms: uniforms, vertexShader: vShader.text(), fragmentShader: fShader.text() });
-      
+               
             var lod1 = new THREE.LOD(),
                 lod2 = new THREE.LOD(),
                 lod3 = new THREE.LOD(),
@@ -459,18 +459,8 @@
             mesh = new THREE.Mesh(meshGeom, meshmat);
             mesh.position = new THREE.Vector3(Math.sin(90) * radius, Math.cos(90) * radius, 0);
             scene.add(mesh);
-
-            var cube;
-//            loader = new THREE.JSONLoader();
-//            loader.load("models/1.js", function (geo) {
-//                var materials = new THREE.MeshLambertMaterial({wireframe:true});
-//                cube = new THREE.Mesh(geo, geo.materials[0]);
-//                scene.add(cube);
-//            });
-       
-
-            
-
+            //mesh.add(camera);
+          
 
             //################### Kamera Steuerung #####################################
 
@@ -491,17 +481,15 @@
 
             //document.addEventListener("mousemove", CameraControllMouseMove, false);
             //document.addEventListener("mousedown", CameraControlMouseDown, false);
-            //document.addEventListener("mouseup", CameraControlMouseUp, false);
+            document.addEventListener("mouseup", CameraControlMouseUp, false);
             //window.addEventListener('DOMMouseScroll', CameraControlMouseWheel, false);
             var moveto = 0;
             function CameraControllMouseMove(event) {
                 event.preventDefault();
                 
-
-
                 
                 if (MouseDown === 1) {
-
+                        
                     moveto = 1;
 
                     window.mouse.X = ((event.clientX/ window.innerWidth) * 2 - 1);
@@ -526,7 +514,7 @@
                 event.preventDefault();
                 if(event.button === 1){
                     MouseDown = 0;
-                 
+                    
                 }
             }
             function CameraControlMouseWheel(event) {
@@ -561,8 +549,8 @@
             function render() {
             
                 var time = Date.now() * 0.005;
-                winkel = (winkel + 0.536) % 360;
-               
+                winkel = (winkel + 1.536) % 360;
+                lod1.rotation = new THREE.Vector3(Math.cos(winkel* Math.PI / 180), Math.sin(winkel* Math.PI / 180), 0);
                 mesh.position = new THREE.Vector3(Math.cos(winkel * Math.PI / 180) * radius, Math.sin(winkel * Math.PI / 180) * radius, 0);
              
                 THREE.SceneUtils.traverseHierarchy(scene, function (node) { if (node instanceof THREE.LOD) node.update(camera) });
@@ -577,37 +565,12 @@
         
         </script>
 
-        <script type="text/javascript" >
-
-            function ui() {
-
-                $("#button").click(function () {
-
-                    var PSpiralForm = parseFloat($("#spiralForm").val()),
-                        PRauschen = parseFloat($("#rauschen").val()),
-                        PSchritweite = parseFloat($("#schritweiteEntfernung").val()),
-                        PEntfernung = parseFloat($("#entfernung").val()),
-                        PSpiralarmabstand = parseFloat($("#spiralabstand").val()),
-                        PAnzahlParticle = parseFloat($("#AnzahlParticle").val());
-
-                    createGalaxy(PSpiralForm, PRauschen, PSchritweite, PEntfernung, PSpiralarmabstand, PAnzahlParticle);
-                });
-            }
-        </script>
+        
         
         </head>
     
     <body  onload="initalize();">
-    <div style="position:absolute;background:#dcdcdc;width:200px;visibility:hidden" id="mouse" >
-
-            <input type=text value="0.021" id="spiralForm" /> SpiralForm
-            <input type=text value="0.2" id="rauschen" /> Rauschen
-            <input type=text value="1" id="schritweiteEntfernung" /> Schritweite
-            <input type=text value="50000000" id="entfernung" /> Entfernung
-            <input type=text value="0.225" id="spiralabstand" /> Spiralarmabstand
-            <input type=text value="26007" id="AnzahlParticle" /> AnzahlParticle
-            <input type="button" id="button" value="los" />
-    </div>
+    
     </body >
   
 </html>
