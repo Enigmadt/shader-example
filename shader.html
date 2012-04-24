@@ -217,8 +217,7 @@
                                             float n_xyz = mix(n_yz.x, n_yz.y, fade_xyz.x);
                                             return 2.2 * n_xyz;
                                         }
-     
-            //                                
+                       
             void main() {
                 
                 vNormal = normal;
@@ -315,7 +314,9 @@
             scene.add(camera);
             
 
-            renderer = new THREE.WebGLRenderer( { clearColor: 0x000000,antialias:true}); //  CanvasRenderer();
+            renderer = new THREE.WebGLRenderer( { clearColor: 0x000000,
+                                                    antialias:false
+                                            }); //  CanvasRenderer();
             renderer.setSize(window.innerWidth - 50, window.innerHeight - 50);
 
             controls = new THREE.TrackballControls(camera);
@@ -375,55 +376,48 @@
             uniforms.texture4.texture.wrapS = uniforms.texture4.texture.wrapT = THREE.RepeatWrapping;
             uniforms.heightMap.texture.wrapS = uniforms.heightMap.texture.wrapT = THREE.RepeatWrapping;
                         
-            camera.position.z = 15100;
+            camera.position.z = 151000;
             
 
             var vShader = $("#vertexshader");
             var fShader = $("#fragmentshader");
-            var scale=1000, detail=6,
-                meshgeo = [[new THREE.OctahedronGeometry(scale, detail),    2100],
-                            [new THREE.OctahedronGeometry(scale, 5), 2500],
-                            [new THREE.OctahedronGeometry(scale, 4), 5000],
-                            [new THREE.OctahedronGeometry(scale, 3), 10000],
-                            [new THREE.OctahedronGeometry(scale, 2), 20000],
-                            [new THREE.OctahedronGeometry(scale, 1), 40000]
+            var scale=80000, detail=4096,
+            
+                meshgeo = [[new THREE.IcosahedronGeometry(detail),    160000],
+                            [new THREE.IcosahedronGeometry(detail/2), 250000],
+                            [new THREE.IcosahedronGeometry(detail/32), 500000],
+                            [new THREE.IcosahedronGeometry(detail/128), 1000000],
+                            [new THREE.IcosahedronGeometry(detail/1024), 2000000],
+                            [new THREE.IcosahedronGeometry(detail/2048), 4000000]
                             ],
                 meshmat=new THREE.ShaderMaterial({ wireframe: false, smooth: true, uniforms: uniforms, vertexShader: vShader.text(), fragmentShader: fShader.text() });
-            //meshmat = new THREE.MeshBasicMaterial({wireframe:false});
+      
             var lod1 = new THREE.LOD(),
-                    lod2 = new THREE.LOD(),
-                    lod3 = new THREE.LOD(),
-                    lod4 = new THREE.LOD(),
-                    lod5 = new THREE.LOD();
+                lod2 = new THREE.LOD(),
+                lod3 = new THREE.LOD(),
+                lod4 = new THREE.LOD(),
+                lod5 = new THREE.LOD();
 
             for (i = 0; i < meshgeo.length; i++) {
-
+        
                 
-
                 var mesh1 = new THREE.Mesh(meshgeo[i][0], meshmat);
                 var mesh2 = new THREE.Mesh(meshgeo[i][0], meshmat);
                 var mesh3 = new THREE.Mesh(meshgeo[i][0], meshmat);
                 var mesh4 = new THREE.Mesh(meshgeo[i][0], meshmat);
                 var mesh5 = new THREE.Mesh(meshgeo[i][0], meshmat);
+                
+                mesh1.scale.set(scale,scale,scale);
+                mesh2.scale.set(scale,scale,scale);
+                mesh3.scale.set(scale,scale,scale);
+                mesh4.scale.set(scale,scale,scale);
+                mesh5.scale.set(scale,scale,scale);
 
-//                mesh1.updateMatrix();
-//                mesh2.updateMatrix();
-//                mesh3.updateMatrix();
-//                mesh4.updateMatrix();
-//                mesh5.updateMatrix();
-//                mesh1.matrixAutoUpdate = false;
-//                mesh2.matrixAutoUpdate = false;
-//                mesh3.matrixAutoUpdate = false;
-//                mesh4.matrixAutoUpdate = false;
-//                mesh5.matrixAutoUpdate = false;
+                lod2.position = new THREE.Vector3(scale*3, 0, 0);
+                lod3.position = new THREE.Vector3(-scale*3, 0, 0);
+                lod4.position = new THREE.Vector3(0, scale*3, 0);
+                lod5.position = new THREE.Vector3(0, -scale*3, 0);
 
-                lod2.position = new THREE.Vector3(3000, 0, 0);
-                lod3.position = new THREE.Vector3(-3000, 0, 0);
-                lod4.position = new THREE.Vector3(0, 3000, 0);
-                lod5.position = new THREE.Vector3(0, -3000, 0);
-
-//                lod1.updateMatrix();
-//                lod1.matrixAutoUpdate = false;
                 lod1.addLevel(mesh1, meshgeo[i][1]);
                 lod2.addLevel(mesh2, meshgeo[i][1]);
                 lod3.addLevel(mesh3, meshgeo[i][1]);
@@ -436,15 +430,6 @@
             scene.add(lod3);
             scene.add(lod4);
             scene.add(lod5);
-
-//            renderer.autoUpdateScene = false;
-
-//            scene.add(mesh1);
-//            scene.add(mesh2);
-//            scene.add(mesh3);
-//            scene.add(mesh4);
-//            scene.add(mesh5);
-
 
             var debugaxis = function (axisLength) {
                 //Shorten the vertex function
@@ -466,7 +451,7 @@
                 createAxis(v(0, 0, -axisLength), v(0, 0, axisLength), 0x0000FF);
             };
 
-            debugaxis(5000);
+            debugaxis(500000);
 
 
             function v(x, y, z) {
@@ -476,7 +461,7 @@
             var line, linegeometry = new THREE.Geometry(),
                 linemat = new THREE.LineBasicMaterial({color: 0xaaaaaa, linewidth: 1});
 
-            var radius=2000,winkel = 0;
+            var radius=200000,winkel = 0;
             for (i = 0; i <= 360; i+=5) {
 
                 linegeometry.vertices.push(v(Math.cos( i * Math.PI/180)* radius, Math.sin(i * Math.PI/180) * radius, 0));
@@ -486,7 +471,7 @@
             line = new THREE.Line(linegeometry, linemat);
             scene.add(line);
 
-            var meshGeom = new THREE.SphereGeometry(100,8,8), meshMater = new THREE.MeshBasicMaterial({color:0xff0000});
+            var meshGeom = new THREE.SphereGeometry(3000,8,8), meshMater = new THREE.MeshBasicMaterial({color:0xff0000});
 
             mesh = new THREE.Mesh(meshGeom, meshmat);
             mesh.position = new THREE.Vector3(Math.sin(90) * radius, Math.cos(90) * radius, 0);
