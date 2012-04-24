@@ -53,15 +53,7 @@
             const int oktave = 4;
             float h = 0.0;
 
-            vec4 gpuGetCell3D(float x, const float y, float z)
-            {
-                float u = (x + y * 31.0) / 256.0;
-                float v = (z - x * 31.0) / 256.0;
-                return (texture2D(texture0, vec2(u,v)));
-            }
             
-            
-     
 
             void main() {
                 
@@ -70,10 +62,9 @@
                 vPosition = position;
                 time1 = time;
 
-                
                 float noise,temp=3000.0;
                 
-                noise = -1.0;
+                noise = ^^ 1.0;
                 
           
                 vNoise = noise;
@@ -82,8 +73,6 @@
                 
                 vec3 newPosition = position + normal * noisefaktor;
                 gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition,1.0 );
-
-                
 
             }
 
@@ -100,7 +89,6 @@
             uniform sampler2D texture2;
             uniform sampler2D texture3;
             uniform sampler2D texture4;
-            uniform sampler2D grass1;
 
             varying vec3 tsPosition;
             varying vec3 tsCameraPosition;
