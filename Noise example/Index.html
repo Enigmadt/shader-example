@@ -6,7 +6,7 @@
             body {
             font-family: Monospace;
             background-color: #000000;
-            margin: 0px;
+        
             overflow: hidden;
             }
 
@@ -15,7 +15,8 @@
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js" ></script>
         <script src="../Scripts/Three.js"></script>
-        <script src="js/require.js" ></script>
+      
+        <script src="js/perlin.js"></script>
         <script type="x-shader/x-vertex" id="vertexshader">
                    
             attribute vec3 aVertexPosition;
@@ -24,7 +25,7 @@
             varying vec3 vPosition;
             varying vec3 vTangent;
             varying vec3 vBinormal;
- 
+            varying float vNoise;
             varying vec3 tsPosition;
             varying vec3 tsCameraPosition;
             varying vec3 tsLightSource;
@@ -32,7 +33,9 @@
             //attribute vec3 normal;
             attribute vec4 tangent;
             attribute vec2 texCoord;
-
+            uniform float noise;
+            
+            
             varying vec2 vUv;
             uniform sampler2D texture0;
             uniform sampler2D texture1;
@@ -45,13 +48,13 @@
             void main() {
                 
                 vNormal = normal;
-                vUv = uv*8000.0;
+                vUv = uv*8.0;
                 vPosition = position;
         
-                
+                vNoise = noise;
                 //noise = texture2D(heightMap,uv).r + texture2D(heightMap,uv).g + texture2D(heightMap,uv).b;
              
-                vec3 newPosition = position + normal ;
+                vec3 newPosition = position + normal * vec3(noise*0.015);
                 gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition,1.0 );
               
                 
@@ -64,20 +67,18 @@
         
             varying vec3 vNormal;
             varying vec3 vPosition;
-    
+            varying float vNoise;
             varying vec2 vUv;
+            varying vec3 tsPosition;
+            varying vec3 tsCameraPosition;
+            varying vec3 tsLightSource;
+            
             uniform sampler2D texture0;
             uniform sampler2D texture1;
             uniform sampler2D texture2;
             uniform sampler2D texture3;
             uniform sampler2D texture4;
             uniform sampler2D heightMap;
-           
-
-            varying vec3 tsPosition;
-            varying vec3 tsCameraPosition;
-            varying vec3 tsLightSource;
-
             uniform vec3 ambientColor; // color of ambient light
             uniform vec3 diffuseColor; // color of diffuse lighting
             uniform vec3 specularColor; // color of specular highlights
@@ -86,7 +87,7 @@
             
             const float persist = 0.38588515;
             float persistence = 1.0;
-            const int frequenz = 8;
+            const int frequenz = 4;
             float h = 0.0;
             
             
@@ -254,27 +255,26 @@
                             return 2.2 * n_xyz;
                             }
             void main() {
-            float vNoise;
+          
             
                 for(int i=0; i < frequenz; i++){
-                    vNoise = cnoise(vec3(vUv.x,vUv.y,1.0)* persistence);
+                    //vNoise = cnoise(vec3(vUv.x,vUv.y,1.0)* persistence);
                     persistence *= persist;
                 }
                 vec4 mycolor;
-              
-                float interpolate = vNoise+0.50;
+       
 
-                if( vNoise < -0.1 ) { mycolor = texture2D(texture0, vUv ); }
-                if( vNoise < 0.0) { mycolor = mix(texture2D(texture0,vUv ),texture2D(texture1,vUv ),vNoise); }
-                if( vNoise >= 0.0 ) { mycolor = texture2D(texture1,vUv ); }
-                if( vNoise > 0.05 ) { mycolor = mix(texture2D(texture1,vUv ),texture2D(texture2,vUv ),vNoise);; }
-                if( vNoise > 0.08 ) { mycolor = texture2D(texture2, vUv ); }
-                if( vNoise > 0.28 ) { mycolor = texture2D(texture3,vUv ); }
-                if( vNoise > 0.65 ) { mycolor = mix(texture2D(texture3,vUv ),texture2D(texture4,vUv ),vNoise);; }
+                if( vNoise < -0.1) { mycolor = texture2D(texture0, vUv ); }
+                if( vNoise < 0.0  && vNoise > -0.1) { mycolor = mix(texture2D(texture0,vUv ),texture2D(texture1,vUv ),vNoise); }
+                if( vNoise >= 0.0  && vNoise  < 0.05) { mycolor = texture2D(texture1,vUv ); }
+                if( vNoise > 0.05 && vNoise < 0.08) { mycolor = mix(texture2D(texture1,vUv ),texture2D(texture2,vUv ),vNoise); }
+                if( vNoise > 0.08 && vNoise < 0.28 ) { mycolor = texture2D(texture2, vUv ); }
+                if( vNoise > 0.28 && vNoise < 0.65 ) { mycolor = texture2D(texture3,vUv ); }
+                if( vNoise > 0.65 && vNoise < 0.7 ) { mycolor = mix(texture2D(texture3,vUv ),texture2D(texture4,vUv ),vNoise); }
                 if( vNoise > 0.7 ) { mycolor = texture2D(texture4, vUv ); }
                 
-
-                //mycolor = mix(texture2D(texture2, vUv*100.0 ),texture2D(heightMap, vUv ),texture2D(heightMap, vUv )*1.8);
+                    
+                mycolor = mix(texture2D(texture2, vUv ),texture2D(heightMap, vUv ),texture2D(heightMap, vUv )*1.8);
                 
 
                 gl_FragColor = mycolor;

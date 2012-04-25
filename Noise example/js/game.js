@@ -12,7 +12,7 @@ renderer = new THREE.WebGLRenderer( {clearColor: 0x5588aa,
                                 }); 
 renderer.setSize(window.innerWidth - 50, window.innerHeight - 50);
 
-
+/*
 controls = new THREE.FlyControls(camera);
 
 controls.movementSpeed = 5000;
@@ -20,8 +20,8 @@ controls.movementSpeed = 5000;
 controls.rollSpeed = Math.PI / 6;
 controls.autoForward = false;
 controls.dragToLook = true; 
+*/
 
-/*
 controls = new THREE.TrackballControls(camera);
 controls.enabled = true;
 controls.rotateSpeed = 1.0;
@@ -34,7 +34,7 @@ controls.dynamicDampingFactor = 0.3;
 controls.minDistance = 1.1;
 controls.maxDistance = 2000000000000;
 controls.keys = [65, 83, 68];
-*/
+
 
 
 // licht einschalten -----------------------
@@ -47,12 +47,6 @@ ambilight.color.setHSV( 0.1, 0.5, 0.3 );
 scene.add(ambilight);
 console.log("Licht und Kamera zur Scene hinzugefügt");
 
-
-var Perlin = require('module/generator/perlin');
-
-
-
-
 attributes = {
     displacement: {
     size: {type: 'f', value: []},
@@ -62,6 +56,7 @@ attributes = {
 
 
 uniforms = {
+    noise: {type: 'f', value: []},
     uscale: {type: "f", value: 100.0},
     ambientColor: {type: "vec3", value:(0.0,0.0,1.0)},
     diffuseColor: {type: "vec3", value:(0.5,0.5,0.5)},
@@ -106,6 +101,11 @@ var lod1 = new THREE.LOD(),
     lod4 = new THREE.LOD(),
     lod5 = new THREE.LOD();
 
+var values = uniforms.noise.value;
+for(i=0; i<meshgeo[0][0].vertices.length; i++ ){
+    values.push(SmoothedNoise(i, i));
+}
+
 
 
 for (i = 0; i < meshgeo.length; i++) {
@@ -116,7 +116,7 @@ for (i = 0; i < meshgeo.length; i++) {
     var mesh3 = new THREE.Mesh(meshgeo[i][0], meshmat1);
     var mesh4 = new THREE.Mesh(meshgeo[i][0], meshmat1);
     var mesh5 = new THREE.Mesh(meshgeo[i][0], meshmat1);
-
+    
 
     lod2.position = new THREE.Vector3(scale*3, 0, 0);
     lod3.position = new THREE.Vector3(-scale*3, 0, 0);
@@ -267,7 +267,7 @@ function render() {
     THREE.SceneUtils.traverseHierarchy(scene, function (node) {if (node instanceof THREE.LOD) node.update(camera)});
     
     var delta = clock.getDelta();
-    controls.update(delta/2);
+    controls.update();
 
     renderer.clear();
     renderer.render(scene, camera);
