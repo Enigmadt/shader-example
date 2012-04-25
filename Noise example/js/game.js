@@ -1,18 +1,27 @@
 
-var camera, scene, renderer,
-    mouse = { X: 0, y: 0 },
+var camera, scene, renderer, container,
+    mouse = {X: 0, y: 0},
     scene = new THREE.Scene(),
     camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000000000000),
     light = new THREE.PointLight(0xFFFFFF, 3, 1000);
 scene.add(camera);
 console.log("Kamera und Licht erstellt");
 
-renderer = new THREE.WebGLRenderer( { clearColor: 0x5588aa,
+renderer = new THREE.WebGLRenderer( {clearColor: 0x5588aa,
                                         antialias: true
                                 }); 
 renderer.setSize(window.innerWidth - 50, window.innerHeight - 50);
 
 
+controls = new THREE.FlyControls(camera);
+
+controls.movementSpeed = 2500;
+
+controls.rollSpeed = Math.PI / 6;
+controls.autoForward = false;
+controls.dragToLook = false 
+
+/*
 controls = new THREE.TrackballControls(camera);
 controls.enabled = true;
 controls.rotateSpeed = 1.0;
@@ -25,7 +34,7 @@ controls.dynamicDampingFactor = 0.3;
 controls.minDistance = 1.1;
 controls.maxDistance = 2000000000000;
 controls.keys = [65, 83, 68];
-
+*/
 
 
 // licht einschalten -----------------------
@@ -34,32 +43,37 @@ light.castShadow = true;
 scene.add(light);
 
 var ambilight = new THREE.AmbientLight(0xffffff);
+ambilight.color.setHSV( 0.1, 0.5, 0.3 );
 scene.add(ambilight);
 console.log("Licht und Kamera zur Scene hinzugefügt");
+
+
+var Perlin = require('module/generator/perlin');
+
 
 
 
 attributes = {
     displacement: {
-    size: { type: 'f', value: [] },
-    customColor: { type: 'c', value: [] }
+    size: {type: 'f', value: []},
+    customColor: {type: 'c', value: []}
     }
 };
 
 
 uniforms = {
-    uscale: { type: "f", value: 100.0 },
-    ambientColor: { type: "vec3", value:(0.0,0.0,1.0) },
-    diffuseColor: { type: "vec3", value:(0.5,0.5,0.5) },
-    SpecularColor: { type: "vec", value:(0.5,0.5,0.5) },
-    shininess: { type: "f", value: 0.5 },
-    scaleBias: { type: "vec2", value: (1.0, 0.5) },
-    heightMap:{ type: "t", value: 0, texture: THREE.ImageUtils.loadTexture("images/hm.jpg") },
-    texture0: { type: "t", value: 1, texture: THREE.ImageUtils.loadTexture( "images/wasser.PNG" ) },
-    texture1: { type: "t", value: 2, texture: THREE.ImageUtils.loadTexture( "images/sand.PNG" ) },
-    texture2: { type: "t", value: 3, texture: THREE.ImageUtils.loadTexture( "images/grass.PNG" ) },
-    texture3: { type: "t", value: 4, texture: THREE.ImageUtils.loadTexture( "images/fels1.png" ) },
-    texture4: { type: "t", value: 5, texture: THREE.ImageUtils.loadTexture( "images/schnee.PNG" ) }
+    uscale: {type: "f", value: 100.0},
+    ambientColor: {type: "vec3", value:(0.0,0.0,1.0)},
+    diffuseColor: {type: "vec3", value:(0.5,0.5,0.5)},
+    SpecularColor: {type: "vec", value:(0.5,0.5,0.5)},
+    shininess: {type: "f", value: 0.5},
+    scaleBias: {type: "vec2", value: (1.0, 0.5)},
+    heightMap:{type: "t", value: 0, texture: THREE.ImageUtils.loadTexture("images/hm.jpg")},
+    texture0: {type: "t", value: 1, texture: THREE.ImageUtils.loadTexture( "images/wasser.PNG" )},
+    texture1: {type: "t", value: 2, texture: THREE.ImageUtils.loadTexture( "images/sand.PNG" )},
+    texture2: {type: "t", value: 3, texture: THREE.ImageUtils.loadTexture( "images/grass.PNG" )},
+    texture3: {type: "t", value: 4, texture: THREE.ImageUtils.loadTexture( "images/fels1.png" )},
+    texture4: {type: "t", value: 5, texture: THREE.ImageUtils.loadTexture( "images/schnee.PNG" )}
 
 };
 
@@ -70,7 +84,7 @@ uniforms.texture3.texture.wrapS = uniforms.texture3.texture.wrapT = THREE.Repeat
 uniforms.texture4.texture.wrapS = uniforms.texture4.texture.wrapT = THREE.RepeatWrapping;
 uniforms.heightMap.texture.wrapS = uniforms.heightMap.texture.wrapT = THREE.RepeatWrapping;
 
-camera.position.z = 851000;
+camera.position.z = 85100;
 //controls.target = new THREE.Vector3(851000, 0, 0);
 
 var vShader = $("#vertexshader");
@@ -84,7 +98,7 @@ var scale=80000, detail=4,
                 [new THREE.IcosahedronGeometry(scale,detail-3),  scale*20],
                 [new THREE.IcosahedronGeometry(scale,detail-3),  scale*25]
                 ],
-    meshmat=new THREE.ShaderMaterial({ wireframe: false, smooth: true, uniforms: uniforms, vertexShader: vShader.text(), fragmentShader: fShader.text() });
+    meshmat=new THREE.ShaderMaterial({wireframe: false, smooth: true, uniforms: uniforms, vertexShader: vShader.text(), fragmentShader: fShader.text()});
 
 var lod1 = new THREE.LOD(),
     lod2 = new THREE.LOD(),
@@ -131,7 +145,7 @@ var debugaxis = function (axisLength) {
     //Create axis (point1, point2, colour)
     function createAxis(p1, p2, color) {
         var line, lineGeometry = new THREE.Geometry(),
-lineMat = new THREE.LineBasicMaterial({ color: color, lineWidth: 1 });
+lineMat = new THREE.LineBasicMaterial({color: color, lineWidth: 1});
         lineGeometry.vertices.push(p1, p2);
         line = new THREE.Line(lineGeometry, lineMat);
         scene.add(line);
@@ -195,22 +209,11 @@ var moveto = 0;
 function CameraControllMouseMove(event) {
     event.preventDefault();
 
-
     if (MouseDown === 1) {
-
         moveto = 1;
-
-        window.mouse.X = ((event.clientX/ window.innerWidth) * 2 - 1);
-        window.mouse.Y = -((event.clientY / window.innerHeight) * 2 + 1);
-
-        //camera.position.z = Math.sin(mouse.X ) * Math.sin(mouse.Y ) * CameraAbstand;
-        // camera.position.x = Math.cos(mouse.X ) * CameraAbstand;
-        // camera.position.y = Math.cos(mouse.Y ) * CameraAbstand;
-
     }
 
 }
-
 function CameraControlMouseDown(event) {
     event.preventDefault();
 
@@ -237,10 +240,10 @@ function CameraControlMouseWheel(event) {
 
 function initalize() {
     //ui();
-
-
-    document.body.appendChild(renderer.domElement);
-
+    container = document.createElement('div');
+    container.appendChild(renderer.domElement);
+    document.body.appendChild(container);
+    controls.domElement = container;
     animate();
 }
 
@@ -252,18 +255,19 @@ function animate() {
     uniforms.uscale.value = camera.position.distanceTo(new THREE.Vector3(0,0,0));               
     render();
 }
-
+var clock = new THREE.Clock();
 var winkel = 0,rendern=0;
 function render() {
 
     var time = Date.now() * 0.005;
     winkel = (winkel + 1.536) % 360;
-    lod1.rotation = new THREE.Vector3(Math.cos(winkel* Math.PI / 180), Math.sin(winkel* Math.PI / 180), 0);
+    //lod1.rotation = new THREE.Vector3(Math.cos(winkel* Math.PI / 180), Math.sin(winkel* Math.PI / 180), 0);
     mesh.position = new THREE.Vector3(Math.cos(winkel * Math.PI / 180) * radius, Math.sin(winkel * Math.PI / 180) * radius, 0);
 
-    THREE.SceneUtils.traverseHierarchy(scene, function (node) { if (node instanceof THREE.LOD) node.update(camera) });
-
-    controls.update();
+    THREE.SceneUtils.traverseHierarchy(scene, function (node) {if (node instanceof THREE.LOD) node.update(camera)});
+    
+    var delta = clock.getDelta();
+    controls.update(delta);
 
     renderer.clear();
     renderer.render(scene, camera);
