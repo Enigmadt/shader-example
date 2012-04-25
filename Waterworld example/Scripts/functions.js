@@ -98,7 +98,7 @@ var uniforms = {
             var size = 1.51, length = 60000,pfeilgroese = 5000;
         
             function v(x,y,z){ 
-                return new THREE.Vertex(new THREE.Vector3(x,y,z)); 
+                return new THREE.Vector3(x,y,z);
             }
 
             var lineGeor = new THREE.Geometry(),
