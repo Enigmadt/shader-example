@@ -45,7 +45,7 @@
             void main() {
                 
                 vNormal = normal;
-                vUv = uv*100.0;
+                vUv = uv*8000.0;
                 vPosition = position;
         
                 
@@ -83,9 +83,9 @@
             uniform float shininess; // how shiny the surface is
             uniform vec2 scaleBias; // x = scale, y = bias
             
-            const float persist = 0.388515;
+            const float persist = 0.38588515;
             float persistence = 1.0;
-            const int frequenz = 4;
+            const int frequenz = 8;
             float h = 0.0;
             
             
@@ -263,13 +263,13 @@
               
                 float interpolate = vNoise+0.50;
 
-                if( vNoise < -0.1 ) { mycolor = texture2D(texture0, vUv );  }
-                if( vNoise < 0.0) { mycolor = (1.0 - interpolate) * texture2D(texture0,vUv ) + interpolate * texture2D(texture1,vUv ); }
+                if( vNoise < -0.1 ) { mycolor = texture2D(texture0, vUv ); }
+                if( vNoise < 0.0) { mycolor = mix(texture2D(texture0,vUv ),texture2D(texture1,vUv ),vNoise); }
                 if( vNoise >= 0.0 ) { mycolor = texture2D(texture1,vUv ); }
-                if( vNoise > 0.05 ) { mycolor = (1.0 - interpolate) * texture2D(texture1,vUv ) + interpolate * texture2D(texture2,vUv ); }
+                if( vNoise > 0.05 ) { mycolor = mix(texture2D(texture1,vUv ),texture2D(texture2,vUv ),vNoise);; }
                 if( vNoise > 0.08 ) { mycolor = texture2D(texture2, vUv ); }
                 if( vNoise > 0.28 ) { mycolor = texture2D(texture3,vUv ); }
-                if( vNoise > 0.65 ) { mycolor = (1.0 - interpolate) * texture2D(texture3,vUv ) + interpolate * texture2D(texture4,vUv ); }
+                if( vNoise > 0.65 ) { mycolor = mix(texture2D(texture3,vUv ),texture2D(texture4,vUv ),vNoise);; }
                 if( vNoise > 0.7 ) { mycolor = texture2D(texture4, vUv ); }
                 
 
