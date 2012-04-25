@@ -1,13 +1,13 @@
 
 var camera, scene, renderer,
-    mouse = { X: 0, y: 0 },
+    mouse = {X: 0, y: 0},
     scene = new THREE.Scene(),
     camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000000000000),
     light = new THREE.PointLight(0xFFFFFF, 3, 1000);
 scene.add(camera);
 console.log("Kamera und Licht erstellt");
 
-renderer = new THREE.WebGLRenderer( { clearColor: 0x5588aa,
+renderer = new THREE.WebGLRenderer( {clearColor: 0x5588aa,
                                         antialias: true
                                 }); 
 renderer.setSize(window.innerWidth - 50, window.innerHeight - 50);
@@ -38,28 +38,32 @@ scene.add(ambilight);
 console.log("Licht und Kamera zur Scene hinzugefügt");
 
 
+var Perlin = require('module/generator/perlin');
+
+
+
 
 attributes = {
     displacement: {
-    size: { type: 'f', value: [] },
-    customColor: { type: 'c', value: [] }
+    size: {type: 'f', value: []},
+    customColor: {type: 'c', value: []}
     }
 };
 
 
 uniforms = {
-    uscale: { type: "f", value: 100.0 },
-    ambientColor: { type: "vec3", value:(0.0,0.0,1.0) },
-    diffuseColor: { type: "vec3", value:(0.5,0.5,0.5) },
-    SpecularColor: { type: "vec", value:(0.5,0.5,0.5) },
-    shininess: { type: "f", value: 0.5 },
-    scaleBias: { type: "vec2", value: (1.0, 0.5) },
-    heightMap:{ type: "t", value: 0, texture: THREE.ImageUtils.loadTexture("images/hm.jpg") },
-    texture0: { type: "t", value: 1, texture: THREE.ImageUtils.loadTexture( "images/wasser.PNG" ) },
-    texture1: { type: "t", value: 2, texture: THREE.ImageUtils.loadTexture( "images/sand.PNG" ) },
-    texture2: { type: "t", value: 3, texture: THREE.ImageUtils.loadTexture( "images/grass.PNG" ) },
-    texture3: { type: "t", value: 4, texture: THREE.ImageUtils.loadTexture( "images/fels1.png" ) },
-    texture4: { type: "t", value: 5, texture: THREE.ImageUtils.loadTexture( "images/schnee.PNG" ) }
+    uscale: {type: "f", value: 100.0},
+    ambientColor: {type: "vec3", value:(0.0,0.0,1.0)},
+    diffuseColor: {type: "vec3", value:(0.5,0.5,0.5)},
+    SpecularColor: {type: "vec", value:(0.5,0.5,0.5)},
+    shininess: {type: "f", value: 0.5},
+    scaleBias: {type: "vec2", value: (1.0, 0.5)},
+    heightMap:{type: "t", value: 0, texture: THREE.ImageUtils.loadTexture("images/hm.jpg")},
+    texture0: {type: "t", value: 1, texture: THREE.ImageUtils.loadTexture( "images/wasser.PNG" )},
+    texture1: {type: "t", value: 2, texture: THREE.ImageUtils.loadTexture( "images/sand.PNG" )},
+    texture2: {type: "t", value: 3, texture: THREE.ImageUtils.loadTexture( "images/grass.PNG" )},
+    texture3: {type: "t", value: 4, texture: THREE.ImageUtils.loadTexture( "images/fels1.png" )},
+    texture4: {type: "t", value: 5, texture: THREE.ImageUtils.loadTexture( "images/schnee.PNG" )}
 
 };
 
@@ -84,7 +88,7 @@ var scale=80000, detail=4,
                 [new THREE.IcosahedronGeometry(scale,detail-3),  scale*20],
                 [new THREE.IcosahedronGeometry(scale,detail-3),  scale*25]
                 ],
-    meshmat=new THREE.ShaderMaterial({ wireframe: false, smooth: true, uniforms: uniforms, vertexShader: vShader.text(), fragmentShader: fShader.text() });
+    meshmat=new THREE.ShaderMaterial({wireframe: false, smooth: true, uniforms: uniforms, vertexShader: vShader.text(), fragmentShader: fShader.text()});
 
 var lod1 = new THREE.LOD(),
     lod2 = new THREE.LOD(),
@@ -131,7 +135,7 @@ var debugaxis = function (axisLength) {
     //Create axis (point1, point2, colour)
     function createAxis(p1, p2, color) {
         var line, lineGeometry = new THREE.Geometry(),
-lineMat = new THREE.LineBasicMaterial({ color: color, lineWidth: 1 });
+lineMat = new THREE.LineBasicMaterial({color: color, lineWidth: 1});
         lineGeometry.vertices.push(p1, p2);
         line = new THREE.Line(lineGeometry, lineMat);
         scene.add(line);
@@ -261,7 +265,7 @@ function render() {
     lod1.rotation = new THREE.Vector3(Math.cos(winkel* Math.PI / 180), Math.sin(winkel* Math.PI / 180), 0);
     mesh.position = new THREE.Vector3(Math.cos(winkel * Math.PI / 180) * radius, Math.sin(winkel * Math.PI / 180) * radius, 0);
 
-    THREE.SceneUtils.traverseHierarchy(scene, function (node) { if (node instanceof THREE.LOD) node.update(camera) });
+    THREE.SceneUtils.traverseHierarchy(scene, function (node) {if (node instanceof THREE.LOD) node.update(camera)});
 
     controls.update();
 
