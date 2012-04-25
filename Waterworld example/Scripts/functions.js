@@ -1,63 +1,78 @@
-            var camera, scene, renderer,
-                mouse = { X: 0, y: 0 },
-                scene = new THREE.Scene(),
-                camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000000000000),
-                light = new THREE.PointLight(0x8a4522, 3, 1000);
-            scene.add(camera);
-            
+var camera, scene, renderer,
+    mouse = {
+        x: 0,
+        y: 0
+    },
+    scene = new THREE.Scene(),
+    camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000000000000),
+    light = new THREE.PointLight(0x8a4522, 3, 1000);
+    
+scene.add(camera);
 
-            renderer = new THREE.WebGLRenderer( { clearColor: 0x000000,antialias: true }); //  CanvasRenderer();
-            renderer.setSize(window.innerWidth - 50, window.innerHeight - 50);
+renderer = new THREE.WebGLRenderer({ clearColor: 0x000000,antialias: true }); //  CanvasRenderer();
+renderer.setSize(window.innerWidth - 50, window.innerHeight - 50);
 
-            controls = new THREE.TrackballControls(camera);
-            controls.enabled = true;
-            controls.rotateSpeed = 1.0;
-            controls.zoomSpeed = 1.2;
-            controls.panSpeed = 0.2;
-            controls.noZoom = false;
-            controls.noPan = false;
-            controls.staticMoving = false;
-            controls.dynamicDampingFactor = 0.3;
-            controls.minDistance = 1.1;
-            controls.maxDistance = 2000000000000;
-            controls.keys = [65, 83, 68];
-            controls.target = new THREE.Vector3(-20000,0,0);
-            
+controls = new THREE.TrackballControls(camera);
+controls.enabled = true;
+controls.rotateSpeed = 1.0;
+controls.zoomSpeed = 1.2;
+controls.panSpeed = 0.2;
+controls.noZoom = false;
+controls.noPan = false;
+controls.staticMoving = false;
+controls.dynamicDampingFactor = 0.3;
+controls.minDistance = 1.1;
+controls.maxDistance = 2000000000000;
+controls.keys = [65, 83, 68];
+controls.target = new THREE.Vector3(-20000, 0, 0);
 
+// licht einschalten -----------------------
+light.position = new THREE.Vector3(0, 5, -5);
+scene.add(light);
 
-            // licht einschalten -----------------------
-            light.position = new THREE.Vector3(0, 5, -5);
-            scene.add(light);
-
-            var ambilight = new THREE.AmbientLight(0xbbbbbb);
-            scene.add(ambilight);
+var ambilight = new THREE.AmbientLight(0xbbbbbb);
+scene.add(ambilight);
             
                        
 
-            attributes = {
-                displacement: {
-                size: { type: 'f', value: [] },
-                customColor: { type: 'c', value: [] }
-                }
-            };
+var attributes = {
+   displacement: {
+      size: {
+         type: 'f',
+         value: []
+      },
+      customColor: {
+         type: 'c',
+         value: []
+      }
+   }
+};
 
             
-            uniforms = {
-                time: {type: "f", value: 0},
-                uscale: { type: "f", value: 100.0 },
-                ambientColor: { type: "vec3", value:(0.0,0.0,1.0) },
-                diffuseColor: { type: "vec3", value:(0.5,0.5,0.5) },
-                SpecularColor: { type: "vec", value:(0.5,0.5,0.5) },
-                shininess: { type: "f", value: 0.5 },
-                scaleBias: { type: "vec2", value:(1.0,0.5) },
-                texture0: { type: "t", value: 0, texture: THREE.ImageUtils.loadTexture( "Content/images/wasser.PNG" ) },
-                texture1: { type: "t", value: 1, texture: THREE.ImageUtils.loadTexture( "Content/images/sand.PNG" ) },
-                texture2: { type: "t", value: 2, texture: THREE.ImageUtils.loadTexture( "Content/images/grass.PNG" ) },
-                texture3: { type: "t", value: 3, texture: THREE.ImageUtils.loadTexture( "Content/images/fels1.png" ) },
-                texture4: { type: "t", value: 4, texture: THREE.ImageUtils.loadTexture( "Content/images/schnee.PNG" ) }
-                //grass1: { type: "t", value: 5, texture: THREE.ImageUtils.loadTexture( "images/grass1.PNG" ) }
-              
-            };
+var uniforms = {
+   time: {
+      type: "f",
+      value: 0
+   },
+   uscale: {
+      type: "f",
+      value: 100.0
+   },
+   ambientColor: {
+      type: "vec3",
+      value:(0.0,0.0,1.0)
+   },
+   diffuseColor: { type: "vec3", value:(0.5,0.5,0.5) },
+   SpecularColor: { type: "vec", value:(0.5,0.5,0.5) },
+   shininess: { type: "f", value: 0.5 },
+   scaleBias: { type: "vec2", value:(1.0,0.5) },
+   texture0: { type: "t", value: 0, texture: THREE.ImageUtils.loadTexture("../Content/images/wasser.png") },
+   texture1: { type: "t", value: 1, texture: THREE.ImageUtils.loadTexture( "../Content/images/sand.PNG" ) },
+   texture2: { type: "t", value: 2, texture: THREE.ImageUtils.loadTexture( "../Content/images/grass.PNG" ) },
+   texture3: { type: "t", value: 3, texture: THREE.ImageUtils.loadTexture( "../Content/images/fels1.png" ) },
+   texture4: { type: "t", value: 4, texture: THREE.ImageUtils.loadTexture( "../Content/images/schnee.PNG" ) }
+   //grass1: { type: "t", value: 5, texture: THREE.ImageUtils.loadTexture( "images/grass1.PNG" ) }
+};
            
             uniforms.texture0.texture.wrapS = uniforms.texture0.texture.wrapT = THREE.RepeatWrapping;
             uniforms.texture1.texture.wrapS = uniforms.texture1.texture.wrapT = THREE.RepeatWrapping;
