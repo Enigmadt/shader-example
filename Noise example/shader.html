@@ -45,7 +45,7 @@
             void main() {
                 
                 vNormal = normal;
-                vUv = uv*100.0;
+                vUv = uv*8000.0;
                 vPosition = position;
         
                 
@@ -83,9 +83,9 @@
             uniform float shininess; // how shiny the surface is
             uniform vec2 scaleBias; // x = scale, y = bias
             
-            const float persist = 0.388515;
+            const float persist = 0.38588515;
             float persistence = 1.0;
-            const int frequenz = 4;
+            const int frequenz = 8;
             float h = 0.0;
             
             
