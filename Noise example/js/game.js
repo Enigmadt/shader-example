@@ -145,7 +145,7 @@ var debugaxis = function (axisLength) {
     //Create axis (point1, point2, colour)
     function createAxis(p1, p2, color) {
         var line, lineGeometry = new THREE.Geometry(),
-lineMat = new THREE.LineBasicMaterial({color: color, lineWidth: 1});
+        lineMat = new THREE.LineBasicMaterial({color: color, lineWidth: 1});
         lineGeometry.vertices.push(p1, p2);
         line = new THREE.Line(lineGeometry, lineMat);
         scene.add(line);
