@@ -60,17 +60,17 @@ var uniforms = {
    },
    ambientColor: {
       type: "vec3",
-      value:(0.0,0.0,1.0)
+      value:(0.0, 0.0, 1.0)
    },
    diffuseColor: { type: "vec3", value:(0.5,0.5,0.5) },
    SpecularColor: { type: "vec", value:(0.5,0.5,0.5) },
    shininess: { type: "f", value: 0.5 },
    scaleBias: { type: "vec2", value:(1.0,0.5) },
-   texture0: { type: "t", value: 0, texture: THREE.ImageUtils.loadTexture("../Content/images/wasser.png") },
-   texture1: { type: "t", value: 1, texture: THREE.ImageUtils.loadTexture( "../Content/images/sand.PNG" ) },
-   texture2: { type: "t", value: 2, texture: THREE.ImageUtils.loadTexture( "../Content/images/grass.PNG" ) },
-   texture3: { type: "t", value: 3, texture: THREE.ImageUtils.loadTexture( "../Content/images/fels1.png" ) },
-   texture4: { type: "t", value: 4, texture: THREE.ImageUtils.loadTexture( "../Content/images/schnee.PNG" ) }
+   texture0: { type: "t", value: 0, texture: THREE.ImageUtils.loadTexture("Content/images/wasser.png") },
+   texture1: { type: "t", value: 1, texture: THREE.ImageUtils.loadTexture("Content/images/sand.PNG") },
+   texture2: { type: "t", value: 2, texture: THREE.ImageUtils.loadTexture("Content/images/grass.PNG") },
+   texture3: { type: "t", value: 3, texture: THREE.ImageUtils.loadTexture("Content/images/fels1.png") },
+   texture4: { type: "t", value: 4, texture: THREE.ImageUtils.loadTexture("Content/images/schnee.PNG") }
    //grass1: { type: "t", value: 5, texture: THREE.ImageUtils.loadTexture( "images/grass1.PNG" ) }
 };
            
