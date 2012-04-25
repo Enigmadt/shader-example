@@ -15,11 +15,11 @@ renderer.setSize(window.innerWidth - 50, window.innerHeight - 50);
 
 controls = new THREE.FlyControls(camera);
 
-controls.movementSpeed = 2500;
+controls.movementSpeed = 5000;
 
 controls.rollSpeed = Math.PI / 6;
 controls.autoForward = false;
-controls.dragToLook = false 
+controls.dragToLook = true; 
 
 /*
 controls = new THREE.TrackballControls(camera);
@@ -84,12 +84,12 @@ uniforms.texture3.texture.wrapS = uniforms.texture3.texture.wrapT = THREE.Repeat
 uniforms.texture4.texture.wrapS = uniforms.texture4.texture.wrapT = THREE.RepeatWrapping;
 uniforms.heightMap.texture.wrapS = uniforms.heightMap.texture.wrapT = THREE.RepeatWrapping;
 
-camera.position.z = 85100;
+camera.position.z = 201000;
 //controls.target = new THREE.Vector3(851000, 0, 0);
 
 var vShader = $("#vertexshader");
 var fShader = $("#fragmentshader");
-var scale=80000, detail=4,
+var scale=80000, detail=6,
 
     meshgeo = [[new THREE.IcosahedronGeometry(scale,detail),        scale*1.5],
                 [new THREE.IcosahedronGeometry(scale,detail-1),     scale*4],
@@ -99,7 +99,7 @@ var scale=80000, detail=4,
                 [new THREE.IcosahedronGeometry(scale,detail-3),  scale*25]
                 ],
     meshmat=new THREE.ShaderMaterial({wireframe: false, smooth: true, uniforms: uniforms, vertexShader: vShader.text(), fragmentShader: fShader.text()});
-
+    meshmat1 = new THREE.MeshLambertMaterial({});
 var lod1 = new THREE.LOD(),
     lod2 = new THREE.LOD(),
     lod3 = new THREE.LOD(),
@@ -112,10 +112,10 @@ for (i = 0; i < meshgeo.length; i++) {
 
 
     var mesh1 = new THREE.Mesh(meshgeo[i][0], meshmat);
-    var mesh2 = new THREE.Mesh(meshgeo[i][0], meshmat);
-    var mesh3 = new THREE.Mesh(meshgeo[i][0], meshmat);
-    var mesh4 = new THREE.Mesh(meshgeo[i][0], meshmat);
-    var mesh5 = new THREE.Mesh(meshgeo[i][0], meshmat);
+    var mesh2 = new THREE.Mesh(meshgeo[i][0], meshmat1);
+    var mesh3 = new THREE.Mesh(meshgeo[i][0], meshmat1);
+    var mesh4 = new THREE.Mesh(meshgeo[i][0], meshmat1);
+    var mesh5 = new THREE.Mesh(meshgeo[i][0], meshmat1);
 
 
     lod2.position = new THREE.Vector3(scale*3, 0, 0);
@@ -267,7 +267,7 @@ function render() {
     THREE.SceneUtils.traverseHierarchy(scene, function (node) {if (node instanceof THREE.LOD) node.update(camera)});
     
     var delta = clock.getDelta();
-    controls.update(delta);
+    controls.update(delta/2);
 
     renderer.clear();
     renderer.render(scene, camera);
