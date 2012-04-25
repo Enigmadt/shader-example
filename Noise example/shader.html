@@ -263,13 +263,13 @@
               
                 float interpolate = vNoise+0.50;
 
-                if( vNoise < -0.1 ) { mycolor = texture2D(texture0, vUv );  }
-                if( vNoise < 0.0) { mycolor = (1.0 - interpolate) * texture2D(texture0,vUv ) + interpolate * texture2D(texture1,vUv ); }
+                if( vNoise < -0.1 ) { mycolor = texture2D(texture0, vUv ); }
+                if( vNoise < 0.0) { mycolor = mix(texture2D(texture0,vUv ),texture2D(texture1,vUv ),vNoise); }
                 if( vNoise >= 0.0 ) { mycolor = texture2D(texture1,vUv ); }
-                if( vNoise > 0.05 ) { mycolor = (1.0 - interpolate) * texture2D(texture1,vUv ) + interpolate * texture2D(texture2,vUv ); }
+                if( vNoise > 0.05 ) { mycolor = mix(texture2D(texture1,vUv ),texture2D(texture2,vUv ),vNoise);; }
                 if( vNoise > 0.08 ) { mycolor = texture2D(texture2, vUv ); }
                 if( vNoise > 0.28 ) { mycolor = texture2D(texture3,vUv ); }
-                if( vNoise > 0.65 ) { mycolor = (1.0 - interpolate) * texture2D(texture3,vUv ) + interpolate * texture2D(texture4,vUv ); }
+                if( vNoise > 0.65 ) { mycolor = mix(texture2D(texture3,vUv ),texture2D(texture4,vUv ),vNoise);; }
                 if( vNoise > 0.7 ) { mycolor = texture2D(texture4, vUv ); }
                 
 
