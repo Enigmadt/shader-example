@@ -80,7 +80,7 @@ var uniforms = {
             uniforms.texture3.texture.wrapS = uniforms.texture3.texture.wrapT = THREE.RepeatWrapping;
             uniforms.texture4.texture.wrapS = uniforms.texture4.texture.wrapT = THREE.RepeatWrapping;
                         
-            camera.position.set(-20050,0,0)
+            camera.position.set(-20050, 0, 0)
             
 
             var vShader = $("#vertexshader");
