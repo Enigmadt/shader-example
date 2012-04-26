@@ -10,27 +10,27 @@
             overflow: hidden;
             }
 
-          
+
         </style>
         <title>WebGl</title>
 
-    
+
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js" ></script>
-        <script src="js/Three.js"></script>
-        
-        
+        <script src="../Scripts/Three.js"></script>
+
+
        <script type="x-shader/x-vertex" id="vertexshader">
 
-        
+
             attribute vec3 aVertexPosition;
-            attribute vec2 aTextureCoord; 
+            attribute vec2 aTextureCoord;
             varying vec3 vNormal;
             varying vec3 vPosition;
             varying float vNoise;
             varying vec3 vTangent;
             varying vec3 vBinormal;
- 
+
             varying vec3 tsPosition;
             varying vec3 tsCameraPosition;
             varying vec3 tsLightSource;
@@ -217,10 +217,10 @@
                                             float n_xyz = mix(n_yz.x, n_yz.y, fade_xyz.x);
                                             return 2.2 * n_xyz;
                                         }
-     
+
 
             void main() {
-                
+
                 vNormal = normal;
                 vUv = uv*1.0;
                 vPosition = position;
@@ -234,27 +234,27 @@
                 tsCameraPosition = cameraPosition * TBNMatrix;
                // tsLightSource = LightSource * TBNMatrix;
 
-        
+
                 float noise;
                 for(int i = 0; i < frequenz; i++)
                 {
                     noise = cnoise( vec3(vec4(position,1.0).x,vec4(position,1.0).y,vec4(position,1.0).z)* persistence ) ;
                     persistence *= persist;
                 }
-                
+
                 noise = texture2D(heightMap,uv).r + texture2D(heightMap,uv).g + texture2D(heightMap,uv).b;
                 vNoise = noise;
                 vec3 newPosition = position + normal * vec3(noise*0.025 ) ;
                 gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition,1.0 );
                 gl_PointSize = 5000.0;
-                
+
 
             }
 
         </script>
 
        <script type="x-shader/x-fragment" id="fragmentshader">
-        
+
             varying vec3 vNormal;
             varying vec3 vPosition;
             varying float vNoise;
@@ -266,7 +266,7 @@
             uniform sampler2D texture4;
             uniform sampler2D grass1;
             uniform sampler2D heightMap;
-           
+
 
             varying vec3 tsPosition;
             varying vec3 tsCameraPosition;
@@ -292,10 +292,10 @@
                 if( vNoise > 0.28 ) { mycolor = texture2D(heightMap,vUv ); }
                 if( vNoise > 0.65 ) { mycolor = (1.0 - interpolate) * texture2D(heightMap,vUv ) + interpolate * texture2D(heightMap,vUv ); }
                 if( vNoise > 0.7 ) { mycolor = texture2D(heightMap, vUv ); }
-                
+
 
                 mycolor = mix(texture2D(texture2, vUv*100.0 ),texture2D(heightMap, vUv ),texture2D(heightMap, vUv )*1.8);
-                
+
 
                 gl_FragColor = mycolor;
             }
@@ -305,7 +305,7 @@
 
 
         <script  type="text/javascript" >
-            
+
 
             var camera, scene, renderer,
                 mouse = { X: 0, y: 0 },
@@ -313,7 +313,7 @@
                 camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000000000000),
                 light = new THREE.PointLight(0xFFFFFF, 3, 1000);
             scene.add(camera);
-            
+
 
             renderer = new THREE.WebGLRenderer( { clearColor: 0x000000,antialias:true}); //  CanvasRenderer();
             renderer.setSize(window.innerWidth - 50, window.innerHeight - 50);
@@ -331,7 +331,7 @@
             controls.maxDistance = 2000000000000;
             controls.keys = [65, 83, 68];
 
-            
+
 
 
             // licht einschalten -----------------------
@@ -341,8 +341,8 @@
 
             //var ambilight = new THREE.AmbientLight(0xffffff);
             //scene.add(ambilight);
-       
-                       
+
+
 
             attributes = {
                 displacement: {
@@ -351,7 +351,7 @@
                 }
             };
 
-            
+
             uniforms = {
                 uscale: { type: "f", value: 100.0 },
                 ambientColor: { type: "vec3", value:(0.0,0.0,1.0) },
@@ -365,18 +365,18 @@
                 texture2: { type: "t", value: 3, texture: THREE.ImageUtils.loadTexture( "images/grass.PNG" ) },
                 texture3: { type: "t", value: 4, texture: THREE.ImageUtils.loadTexture( "images/fels1.png" ) },
                 texture4: { type: "t", value: 5, texture: THREE.ImageUtils.loadTexture( "images/schnee.PNG" ) }
-              
+
             };
-           
+
             uniforms.texture0.texture.wrapS = uniforms.texture0.texture.wrapT = THREE.RepeatWrapping;
             uniforms.texture1.texture.wrapS = uniforms.texture1.texture.wrapT = THREE.RepeatWrapping;
             uniforms.texture2.texture.wrapS = uniforms.texture2.texture.wrapT = THREE.RepeatWrapping;
             uniforms.texture3.texture.wrapS = uniforms.texture3.texture.wrapT = THREE.RepeatWrapping;
             uniforms.texture4.texture.wrapS = uniforms.texture4.texture.wrapT = THREE.RepeatWrapping;
             uniforms.heightMap.texture.wrapS = uniforms.heightMap.texture.wrapT = THREE.RepeatWrapping;
-                        
+
             camera.position.z = 15100;
-            
+
 
             var vShader = $("#vertexshader");
             var fShader = $("#fragmentshader");
@@ -398,7 +398,7 @@
 
             for (i = 0; i < meshgeo.length; i++) {
 
-                
+
 
                 var mesh1 = new THREE.Mesh(meshgeo[i][0], meshmat);
                 var mesh2 = new THREE.Mesh(meshgeo[i][0], meshmat);
@@ -429,7 +429,7 @@
                 lod3.addLevel(mesh3, meshgeo[i][1]);
                 lod4.addLevel(mesh4, meshgeo[i][1]);
                 lod5.addLevel(mesh5, meshgeo[i][1]);
-                
+
             }
             scene.add(lod1);
             scene.add(lod2);
@@ -480,9 +480,9 @@
             for (i = 0; i <= 360; i+=5) {
 
                 linegeometry.vertices.push(v(Math.cos( i * Math.PI/180)* radius, Math.sin(i * Math.PI/180) * radius, 0));
-          
+
             }
-            
+
             line = new THREE.Line(linegeometry, linemat);
             scene.add(line);
 
@@ -499,15 +499,15 @@
 //                cube = new THREE.Mesh(geo, geo.materials[0]);
 //                scene.add(cube);
 //            });
-       
 
-            
+
+
 
 
             //################### Kamera Steuerung #####################################
 
-            var CameraAbstand = 30, 
-                CameraDrehGeschwindigkeit = 0.4, 
+            var CameraAbstand = 30,
+                CameraDrehGeschwindigkeit = 0.4,
                 CameraTarget = new THREE.Vector3(0, 0, 0),
                 MouseDown = 0,
                 oldMouseX = 0,
@@ -528,10 +528,10 @@
             var moveto = 0;
             function CameraControllMouseMove(event) {
                 event.preventDefault();
-                
 
 
-                
+
+
                 if (MouseDown === 1) {
 
                     moveto = 1;
@@ -542,14 +542,14 @@
                     //camera.position.z = Math.sin(mouse.X ) * Math.sin(mouse.Y ) * CameraAbstand;
                    // camera.position.x = Math.cos(mouse.X ) * CameraAbstand;
                    // camera.position.y = Math.cos(mouse.Y ) * CameraAbstand;
-                    
+
                 }
 
             }
 
             function CameraControlMouseDown(event) {
                 event.preventDefault();
-                
+
                 if (event.button === 2) {
                     MouseDown = 1;
                 }
@@ -558,7 +558,7 @@
                 event.preventDefault();
                 if(event.button === 1){
                     MouseDown = 0;
-                 
+
                 }
             }
             function CameraControlMouseWheel(event) {
@@ -570,10 +570,10 @@
 
 
             //#################### Kamera Steuerung ENDE ################################
-           
+
             function initalize() {
                 //ui();
-                           
+
 
                 document.body.appendChild(renderer.domElement);
 
@@ -585,13 +585,13 @@
             function animate() {
 
                 requestAnimationFrame(animate);
-                uniforms.uscale.value = camera.position.distanceTo(new THREE.Vector3(0,0,0));               
+                uniforms.uscale.value = camera.position.distanceTo(new THREE.Vector3(0,0,0));
                 render();
             }
 
             var winkel = 0;
             function render() {
-            
+
                 var time = Date.now() * 0.005;
                 winkel = (winkel + 1.36) % 360;
                 //alert(Math.cos(winkel));
@@ -600,11 +600,11 @@
 
                 //scene.updateMatrixWorld();
                 THREE.SceneUtils.traverseHierarchy(scene, function (node) { if (node instanceof THREE.LOD) node.update(camera) });
-                
+
                 //camera.position.x += 0.1;
                 // camera.lookAt(CameraTarget);
                 //particleSystem.rotation.y -= 0.00051 % 360
-                
+
 
                 if (moveto == 1) {
 
@@ -615,16 +615,16 @@
                     else {
                        //camera.translateZ(-camera.position.distanceTo(new THREE.Vector3(0, 0, 3000000000))/5 );
                     }
-                    
+
                 }
-            
+
                 controls.update();
 
                 renderer.clear();
                 renderer.render(scene, camera);
             }
 
-        
+
         </script>
 
         <script type="text/javascript" >
@@ -644,10 +644,10 @@
                 });
             }
         </script>
-        
+
         </head>
     <div style="position:absolute;background:#dcdcdc;width:200px;visibility:hidden" id="mouse" >
-        
+
         <input type=text value="0.021" id="spiralForm" /> SpiralForm
         <input type=text value="0.2" id="rauschen" /> Rauschen
         <input type=text value="1" id="schritweiteEntfernung" /> Schritweite
@@ -661,5 +661,5 @@
     <body  onload="initalize();">
 
     </body >
-  
+
 </html>
