@@ -48,8 +48,6 @@ scene.add(ambilight);
 console.log("Licht und Kamera zur Scene hinzugefügt");
 
 
-var Perlin = require('module/generator/perlin');
-
 
 
 
