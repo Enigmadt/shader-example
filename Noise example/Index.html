@@ -16,7 +16,7 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js" ></script>
         <script src="../Scripts/Three.js"></script>
       
-        <script src="js/perlin.js"></script>
+        <script src="scripts/perlin.js"></script>
         <script type="x-shader/x-vertex" id="vertexshader">
                    
             attribute vec3 aVertexPosition;
@@ -46,7 +46,7 @@
             uniform float uscale;
   
             void main() {
-                
+                //
                 vNormal = normal;
                 vUv = uv*8.0;
                 vPosition = position;
@@ -281,7 +281,7 @@
             }
 
         </script>
-        <script src="js/game.js"></script>
+        <script src="Scripts/game.js"></script>
        
         
         </head>
