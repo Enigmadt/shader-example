@@ -15,7 +15,7 @@ renderer.setSize(window.innerWidth - 50, window.innerHeight - 50);
 
 controls = new THREE.FlyControls(camera);
 
-controls.movementSpeed = 5000;
+controls.movementSpeed = 50000;
 
 controls.rollSpeed = Math.PI / 6;
 controls.autoForward = false;
@@ -82,7 +82,7 @@ uniforms.texture3.texture.wrapS = uniforms.texture3.texture.wrapT = THREE.Repeat
 uniforms.texture4.texture.wrapS = uniforms.texture4.texture.wrapT = THREE.RepeatWrapping;
 uniforms.heightMap.texture.wrapS = uniforms.heightMap.texture.wrapT = THREE.RepeatWrapping;
 
-camera.position.z = 201000;
+camera.position.z = 151000;
 //controls.target = new THREE.Vector3(851000, 0, 0);
 
 var vShader = $("#vertexshader");
