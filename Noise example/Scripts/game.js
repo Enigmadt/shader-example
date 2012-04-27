@@ -15,7 +15,7 @@ renderer.setSize(window.innerWidth - 50, window.innerHeight - 50);
 
 controls = new THREE.FlyControls(camera);
 
-controls.movementSpeed = 50000;
+controls.movementSpeed = 100000;
 
 controls.rollSpeed = Math.PI / 6;
 controls.autoForward = false;
@@ -265,7 +265,7 @@ function render() {
     THREE.SceneUtils.traverseHierarchy(scene, function (node) {if (node instanceof THREE.LOD) node.update(camera)});
     
     var delta = clock.getDelta();
-    controls.update(delta/2);
+    controls.update(delta/1.2);
 
     renderer.clear();
     renderer.render(scene, camera);
