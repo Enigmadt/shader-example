@@ -1,6 +1,6 @@
 var canvWidth = window.innerWidth,
     canvHeight = window.innerHeight,
-    camera = new THREE.PerspectiveCamera(45, canvWidth / canvHeight, 0.001, 1000000000000),
+    camera = new THREE.PerspectiveCamera(45, canvWidth / canvHeight, 100, 1000000000000),
     scene = new THREE.Scene(),
     renderer = new THREE.WebGLRenderer({clearColor: 0x000000, antialias: true}),
     mouse = {
