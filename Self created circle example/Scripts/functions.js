@@ -1,6 +1,6 @@
 var canvWidth = window.innerWidth,
     canvHeight = window.innerHeight,
-    camera = new THREE.PerspectiveCamera(45, canvWidth / canvHeight, 1, 1000000000000),
+    camera = new THREE.PerspectiveCamera(45, canvWidth / canvHeight, 100, 1000000000000),
     scene = new THREE.Scene(),
     renderer = new THREE.WebGLRenderer({clearColor: 0x000000, antialias: true}),
     mouse = {
@@ -15,7 +15,7 @@ var canvWidth = window.innerWidth,
        showShadowCamera: true
     },
     light = new THREE.SpotLight(lightObj.lightColor),
-    controls = new TRHEE.TrackballControls(camera);
+    controls = new THREE.TrackballControls(camera);
 
 /** /
 var ambientlight = new THREE.AmbientLight(lightObj.lightColor);
@@ -140,7 +140,7 @@ function createScene(geometry)
    //geometry.materials[0].shading = THREE.FlatShading;
    //geometry.materials[0].morphTargets = true;
 
-   var materials = new THREE.MeshFaceMaterial({ lights: false });
+   var materials = new THREE.MeshFaceMaterial({lights: false});
    console.log(geometry);
    console.log(materials);
 
@@ -162,7 +162,7 @@ function createScene(geometry)
 var loader = new THREE.JSONLoader();
 loader.load("models/VertexPaintTest.json", createScene);
 
-var debugaxis = function(axisLength)
+(function(axisLength)
 {
    //Shorten the vertex function
    function v(x, y, z)
@@ -173,58 +173,65 @@ var debugaxis = function(axisLength)
    //Create axis (point1, point2, colour)
    function createAxis(p1, p2, color)
    {
-      var line, lineGeometry = new THREE.Geometry(),
-            lineMat = new THREE.LineBasicMaterial({color: color, lineWidth: 1});
-                    lineGeometry.vertices.push(p1, p2);
-                    line = new THREE.Line(lineGeometry, lineMat);
-                    scene.add(line);
-                }
+      var line,
+          lineGeometry = new THREE.Geometry(),
+          lineMat = new THREE.LineBasicMaterial({color: color, lineWidth: 1});
 
-                createAxis(v(0, 0, 0), v(axisLength, 0, 0), 0xFF0000);
-                createAxis(v(0, 0, 0), v(0, axisLength, 0), 0x00FF00);
-                createAxis(v(0, 0, -axisLength), v(0, 0, 0), 0x0000FF);
-            };
+      lineGeometry.vertices.push(p1, p2);
+      line = new THREE.Line(lineGeometry, lineMat);
 
-            debugaxis(5000);
+      scene.add(line);
+   }
 
-
-            function v(x, y, z) {
-                return new THREE.Vector3(x, y, z);
-            }
-
-            var line, linegeometry = new THREE.Geometry(),
-                lineMat = new THREE.LineBasicMaterial({color: 0xff0000, linewidth: 10});
-				meshMat = new THREE.MeshBasicMaterial({color: 0xaaaaaa, wireframe: false}),
-				lineMesh = new THREE.Mesh(linegeometry, meshMat);
-
-			var radius = 2000, winkel = 0;
-            for (i = 0; i <= 360; i++)
-			{
-                linegeometry.vertices.push(v(Math.cos(i * Math.PI / 180) * radius, 0, (Math.sin(i * Math.PI / 180) * radius) * -1));
-
-				//console.log("X: "+linegeometry.vertices[i].position.x);
-				//console.log("Z: "+linegeometry.vertices[i].position.z);
-            }
-
-			var verticesLength = linegeometry.vertices.length - 1;
-
-			for(var j = 0; j < verticesLength; j++)
-			{
-			   linegeometry.faces.push(new THREE.Face3(j, j + 1, verticesLength - j));
-			}
-
-			line = new THREE.Line(linegeometry, lineMat);
-			lineMesh.doubleSided = true;
-			lineMesh.add(line);
-            scene.add(lineMesh);
+   createAxis(v(0, 0, 0), v(axisLength, 0, 0), 0xFF0000);
+   createAxis(v(0, 0, 0), v(0, axisLength, 0), 0x00FF00);
+   createAxis(v(0, 0, -axisLength), v(0, 0, 0), 0x0000FF);
+}(500));
 
 
-            var meshGeom = new THREE.SphereGeometry(100,8,8),
-			meshMater = new THREE.MeshBasicMaterial({color:0xff0000});
+function v(x, y, z)
+{
+   return new THREE.Vector3(x, y, z);
+}
 
-            mesh = new THREE.Mesh(meshGeom, meshMater);
-            mesh.position = new THREE.Vector3(Math.sin(90) * radius, Math.cos(90) * radius, 0);
-            scene.add(mesh);
+var lineGeometry = new THREE.Geometry(),
+    meshGeometry = new THREE.Geometry()
+    lineMat = new THREE.LineBasicMaterial({color: 0xffffff, linewidth: 10}),
+	 meshMat = new THREE.MeshBasicMaterial({color: 0x444444, wireframe: false}),
+    line = new THREE.Line(lineGeometry, lineMat);
+	 lineMesh = new THREE.Mesh(meshGeometry, meshMat),
+    radius = 2000;
+
+for(i = 0; i <= 360; i++)
+{
+   lineGeometry.vertices.push(v(Math.cos(i * Math.PI / 180) * radius, 0, (Math.sin(i * Math.PI / 180) * radius) * -1));
+   meshGeometry.vertices.push(v(Math.cos(i * Math.PI / 180) * radius, 0, (Math.sin(i * Math.PI / 180) * radius) * -1));
+
+   //console.log("X: "+linegeometry.vertices[i].position.x);
+   //console.log("Z: "+linegeometry.vertices[i].position.z);
+}
+
+var verticesLength = lineGeometry.vertices.length - 1;
+
+for(var j = 0; j < verticesLength; j++)
+{
+   meshGeometry.faces.push(new THREE.Face3(j, j + 1, verticesLength - j));
+}
+
+meshGeometry.mergeVertices();
+meshGeometry.computeCentroids();
+
+lineMesh.doubleSided = true;
+lineMesh.add(line);
+scene.add(lineMesh);
+
+
+//            var meshGeom = new THREE.SphereGeometry(100,8,8),
+//			meshMater = new THREE.MeshBasicMaterial({color:0xff0000});
+//
+//            mesh = new THREE.Mesh(meshGeom, meshMater);
+//            mesh.position = new THREE.Vector3(Math.sin(90) * radius, Math.cos(90) * radius, 0);
+//            scene.add(mesh);
 
 
 
@@ -304,36 +311,13 @@ var debugaxis = function(axisLength)
             }
             function animate() {
                 requestAnimationFrame(animate);
-                uniforms.uscale.value = camera.position.distanceTo(new THREE.Vector3(0,0,0));
                 render();
             }
 
-            function render() {
-                var time = Date.now() * 0.005;
-                winkel = (winkel + 0.36) % 360;
-                //alert(Math.cos(winkel));
-                mesh.position = new THREE.Vector3(Math.cos(winkel * Math.PI / 180) * radius, Math.sin(winkel * Math.PI / 180) * radius, 0);
+function render()
+{
+   controls.update();
+   renderer.render(scene, camera);
 
-                //camera.position.x += 0.1;
-                // camera.lookAt(CameraTarget);
-                //particleSystem.rotation.y -= 0.00051 % 360
-
-
-                if (moveto == 1) {
-
-                    if (camera.position.distanceTo(new THREE.Vector3(0, 0, 10000000)) <= 10) {
-
-                        //moveto = 0;
-                    }
-                    else {
-                       //camera.translateZ(-camera.position.distanceTo(new THREE.Vector3(0, 0, 3000000000))/5 );
-                    }
-
-                }
-
-                controls.update();
-
-                renderer.render(scene, camera);
-
-				console.log();
-            }
+	console.log();
+}

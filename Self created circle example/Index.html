@@ -1,12 +1,12 @@
 <!DOCTYPE html>
- 
+
 <html>
  <head>
   <title>Example1</title>
   <meta charset="utf-8">
- 
-  <link rel="stylesheet" type="text/css" href="Content/styles.css" />
-  
+
+  <link rel="stylesheet" type="text/css" href="../Content/styles.css" />
+
   <script type="x-shader/x-vertex" id="vertexshader">
    varying vec3 vNormal;
    varying vec3 vPosition;
@@ -42,7 +42,7 @@
    {
       float u = (x + y * 31.0) / 256.0;
       float v = (z - x * 31.0) / 256.0;
-   
+
        return (texture2D(texture0, vec2(u,v)));
    }
 
@@ -103,7 +103,7 @@
       grasc = 1.0,
       felsc = 1.0,
       schneec = 1.0;
-    
+
       // Wasser.
       if(vNoise < -0.1)
       {
@@ -133,11 +133,11 @@
       // Schnee.
       if(vNoise > 0.7){}
 
-      mycolor = mix(mc0, mc1, vNoise);// + mc2 + mc3 + mc4;     
+      mycolor = mix(mc0, mc1, vNoise);// + mc2 + mc3 + mc4;
       gl_FragColor = mycolor;
    }
   </script>
- </head>        
+ </head>
 
  <body onload="initalize();">
   <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js" ></script>
