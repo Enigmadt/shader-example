@@ -52,7 +52,7 @@
                 vPosition = position;
         
                 vNoise = noise;
-                vNoise = texture2D(heightMap,vUv).r + texture2D(heightMap,vUv).g + texture2D(heightMap,vUv).b;
+                vNoise = (texture2D(heightMap,vUv).r + texture2D(heightMap,vUv).g + texture2D(heightMap,vUv).b)/3.0;
              
                 vec3 newPosition = position + normal * vec3(vNoise*2000.015);
                 gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition,1.0 );
@@ -274,7 +274,7 @@
                 if( vNoise > 0.7 ) { mycolor = texture2D(texture4, vUv ); }
                 
                     
-                mycolor = mix(texture2D(texture2, vUv*50.0 ),texture2D(heightMap, vUv ),texture2D(heightMap, vUv )*1.5);
+                mycolor = mix(texture2D(texture2, vUv*50.0 ),texture2D(heightMap, vUv ),vNoise);
                 
 
                 gl_FragColor = mycolor;
