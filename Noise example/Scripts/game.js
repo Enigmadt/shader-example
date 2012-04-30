@@ -2,8 +2,8 @@
 var camera, scene, renderer, container,
     mouse = {X: 0, y: 0},
     scene = new THREE.Scene(),
-    camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000000000000),
-    light = new THREE.PointLight(0xFFFFFF, 3, 1000);
+    camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000000000000);
+    
 scene.add(camera);
 console.log("Kamera und Licht erstellt");
 
@@ -12,7 +12,7 @@ renderer = new THREE.WebGLRenderer( {clearColor: 0x5588aa,
                                 }); 
 renderer.setSize(window.innerWidth - 50, window.innerHeight - 50);
 
-
+/*
 controls = new THREE.FlyControls(camera);
 
 controls.movementSpeed = 100000;
@@ -20,8 +20,8 @@ controls.movementSpeed = 100000;
 controls.rollSpeed = Math.PI / 6;
 controls.autoForward = false;
 controls.dragToLook = true; 
+*/
 
-/*
 controls = new THREE.TrackballControls(camera);
 controls.enabled = true;
 controls.rotateSpeed = 1.0;
@@ -34,16 +34,17 @@ controls.dynamicDampingFactor = 0.3;
 controls.minDistance = 1.1;
 controls.maxDistance = 2000000000000;
 controls.keys = [65, 83, 68];
-*/
+
 
 
 // licht einschalten -----------------------
-light.position = new THREE.Vector3(0, 0, 0);
+var light = new THREE.PointLight(0xabcdef, 1.5, 10000000000000000);
+light.position = new THREE.Vector3(0, 0, 350000);
 light.castShadow = true;
 scene.add(light);
 
-var ambilight = new THREE.AmbientLight(0xffffff);
-ambilight.color.setHSV( 0.1, 0.5, 0.3 );
+var ambilight = new THREE.AmbientLight(0xff0000);
+ambilight.color.setHSV( 1.0, 0.0, 0.0 );
 scene.add(ambilight);
 console.log("Licht und Kamera zur Scene hinzugefügt");
 
@@ -61,11 +62,25 @@ attributes = {
 
 uniforms = {
     uscale: {type: "f", value: 100.0},
-    ambientColor: {type: "vec3", value:(0.0,0.0,1.0)},
-    diffuseColor: {type: "vec3", value:(0.5,0.5,0.5)},
-    SpecularColor: {type: "vec", value:(0.5,0.5,0.5)},
+    
+    ambientLightColor: {type: "c", value: ambilight.color},
+    
+    directionalLightColor: {type: "c", value:THREE.Vector3(0,0,0)},
+    directionalLightDirection: {type: "v3", value:THREE.Vector3(0,0,0)},
+    
+    pointLightColor: {type: "c", value: light.color},
+    pointLightPosition: {type: "v3", value: light.position},
+    pointLightDistance: {type: "v3", value: light.distance},
+    
+    spotLightColor: {type: "c", value:THREE.Vector3(0.5,0.5,0.5)},
+    spotLightPosition: {type: "v3", value:THREE.Vector3(0.5,0.5,0.5)},
+    spotLightDistance: {type: "f", value: 0.0},
+    spotLightDirection: {type: "v3", value:THREE.Vector3(0.5,0.5,0.5)},
+    spotLightAngle: {type: "f", value:0.0},
+    spotLightExponent: {type: "f", value:0.0},
+    
     shininess: {type: "f", value: 0.5},
-    scaleBias: {type: "vec2", value: (1.0, 0.5)},
+    scaleBias: {type: "v2", value: (1.0, 0.5)},
     heightMap:{type: "t", value: 0, texture: THREE.ImageUtils.loadTexture("images/hm.jpg")},
     texture0: {type: "t", value: 1, texture: THREE.ImageUtils.loadTexture( "images/wasser.PNG" )},
     texture1: {type: "t", value: 2, texture: THREE.ImageUtils.loadTexture( "images/sand.PNG" )},
@@ -96,8 +111,10 @@ var scale=80000, detail=6,
                 [new THREE.IcosahedronGeometry(scale,detail-3),  scale*20],
                 [new THREE.IcosahedronGeometry(scale,detail-3),  scale*25]
                 ],
-    meshmat=new THREE.ShaderMaterial({wireframe: false, smooth: true, uniforms: uniforms, vertexShader: vShader.text(), fragmentShader: fShader.text()});
+    meshmat=new THREE.ShaderMaterial({wireframe: false, lights: true, uniforms: uniforms, vertexShader: vShader.text(), fragmentShader: fShader.text()});
     meshmat1 = new THREE.MeshLambertMaterial({});
+    
+    
 var lod1 = new THREE.LOD(),
     lod2 = new THREE.LOD(),
     lod3 = new THREE.LOD(),
@@ -265,7 +282,7 @@ function render() {
     THREE.SceneUtils.traverseHierarchy(scene, function (node) {if (node instanceof THREE.LOD) node.update(camera)});
     
     var delta = clock.getDelta();
-    controls.update(delta/1.2);
+    controls.update();
 
     renderer.clear();
     renderer.render(scene, camera);

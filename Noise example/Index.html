@@ -14,7 +14,7 @@
         <title>WebGl</title>
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js" ></script>
-        <script src="../Scripts/Three.js"></script>
+        <script src="../Scripts/Threedebug.js"></script>
       
         <script src="scripts/perlin.js"></script>
         <script type="x-shader/x-vertex" id="vertexshader">
@@ -71,7 +71,7 @@
             varying vec2 vUv;
             varying vec3 tsPosition;
             varying vec3 tsCameraPosition;
-            varying vec3 tsLightSource;
+           
             
             uniform sampler2D texture0;
             uniform sampler2D texture1;
@@ -79,11 +79,9 @@
             uniform sampler2D texture3;
             uniform sampler2D texture4;
             uniform sampler2D heightMap;
-            uniform vec3 ambientColor; // color of ambient light
-            uniform vec3 diffuseColor; // color of diffuse lighting
-            uniform vec3 specularColor; // color of specular highlights
-            uniform float shininess; // how shiny the surface is
-            uniform vec2 scaleBias; // x = scale, y = bias
+            
+            uniform vec3 ambientLightColor;
+           
             
             const float persist = 0.38588515;
             float persistence = 1.0;
