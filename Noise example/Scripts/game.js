@@ -53,10 +53,7 @@ console.log("Licht und Kamera zur Scene hinzugefügt");
 
 
 attributes = {
-    displacement: {
-    size: {type: 'f', value: []},
-    customColor: {type: 'c', value: []}
-    }
+    displacement: {type: 'f', value: []}
 };
 
 
@@ -102,16 +99,16 @@ camera.position.z = 151000;
 
 var vShader = $("#vertexshader");
 var fShader = $("#fragmentshader");
-var scale=80000, detail=6,
+var scale=80000, detail=5,
 
     meshgeo = [[new THREE.IcosahedronGeometry(scale,detail),        scale*1.5],
                 [new THREE.IcosahedronGeometry(scale,detail-1),     scale*4],
                 [new THREE.IcosahedronGeometry(scale,detail-2),    scale*8],
                 [new THREE.IcosahedronGeometry(scale,detail-3),   scale*15],
-                [new THREE.IcosahedronGeometry(scale,detail-3),  scale*20],
-                [new THREE.IcosahedronGeometry(scale,detail-3),  scale*25]
+                [new THREE.IcosahedronGeometry(scale,detail-4),  scale*20],
+                [new THREE.IcosahedronGeometry(scale,detail-5),  scale*25]
                 ],
-    meshmat=new THREE.ShaderMaterial({wireframe: false, lights: true, uniforms: uniforms, vertexShader: vShader.text(), fragmentShader: fShader.text()});
+    meshmat=new THREE.ShaderMaterial({wireframe: false, lights: true,attributes: attributes, uniforms: uniforms, vertexShader: vShader.text(), fragmentShader: fShader.text()});
     meshmat1 = new THREE.MeshLambertMaterial({});
     
     
@@ -150,6 +147,19 @@ scene.add(lod2);
 scene.add(lod3);
 scene.add(lod4);
 scene.add(lod5);
+
+var n=0;
+
+for(i=0; i < meshgeo[0][0].vertices.length; i++ ){
+    
+    n = PerlinNoise.noise(meshgeo[0][0].vertices[i].x, meshgeo[0][0].vertices[i].y,meshgeo[0][0].vertices[i].z);
+  
+    attributes.displacement.value.push( n );
+    
+}
+console.log(attributes.displacement);
+
+
 
 var debugaxis = function (axisLength) {
     //Shorten the vertex function
@@ -200,20 +210,6 @@ scene.add(mesh);
 
 
 //################### Kamera Steuerung #####################################
-
-var CameraAbstand = 30, 
-    CameraDrehGeschwindigkeit = 0.4, 
-    CameraTarget = new THREE.Vector3(0, 0, 0),
-    MouseDown = 0,
-    oldMouseX = 0,
-    oldMouseY = 0,
-    moveX = 0,
-    moveY = 0;
-
-
-var rotateStart = new THREE.Vector3(),
-    rotateEnd = new THREE.Vector3(),
-    eye = new THREE.Vector3();
 
 
 //document.addEventListener("mousemove", CameraControllMouseMove, false);
@@ -280,7 +276,7 @@ function render() {
     mesh.position = new THREE.Vector3(Math.cos(winkel * Math.PI / 180) * radius, Math.sin(winkel * Math.PI / 180) * radius, 0);
 
     THREE.SceneUtils.traverseHierarchy(scene, function (node) {if (node instanceof THREE.LOD) node.update(camera)});
-    
+    lod1.position.x +=(-1000);
     var delta = clock.getDelta();
     controls.update();
 
