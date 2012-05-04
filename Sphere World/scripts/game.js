@@ -37,8 +37,8 @@ function createWorld(){
             new THREE.MeshPhongMaterial({color: 0x5a5c5f}));
     scene.add(mesh);
     
-    area = new THREE.Mesh(new THREE.CubeGeometry(2000, 2000, 1, 1, 1, 1), new THREE.MeshBasicMaterial({}));
-    area.position = new THREE.Vector3(0,0,-200000);
+    area = new THREE.Mesh(new THREE.CubeGeometry(2000, 2000, 500, 1, 1, 1), new THREE.MeshBasicMaterial({}));
+    area.position = new THREE.Vector3(0,0,-200100);
     scene.add(area);
 }
 
