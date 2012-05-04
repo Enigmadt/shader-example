@@ -29,22 +29,30 @@ function createLight(){
     licht.position = new THREE.Vector3(0,-5000,0);
     licht.name = "licht";
     scene.add(licht);
+    
+    ambientlicht = new THREE.AmbientLight(0x444444);
+    scene.add(ambientlicht);
 }
 
 function createWorld(){
     
     mesh = new THREE.Mesh(new THREE.IcosahedronGeometry(200000, 5), 
-            new THREE.MeshPhongMaterial({color: 0x5a5c5f}));
+            new THREE.MeshLambertMaterial({color: 0x5a5c5f}));
     scene.add(mesh);
     
     geo = new THREE.CubeGeometry(2000, 2000, 500, 1, 1, 1);
     mat = new THREE.MeshBasicMaterial({});
     
-    for(i=0; i<360; i++){
-        area = new THREE.Mesh(geo,mat );
-        area.position = new THREE.Vector3(Math.sin(i*Math.PI/180)*200000,0,Math.cos(i*Math.PI/180)*200000);
-        area.lookAt(new THREE.Vector3(0,0,0));
-        scene.add(area);
+    for(i=0; i<360; i+=5){
+        for(l=0; l<180; l+=5){
+            area = new THREE.Mesh(geo,mat );
+            radius = 200000;
+            area.position = new THREE.Vector3(Math.sin(i*Math.PI/180)*radius,
+                                                Math.cos(l*Math.PI/180)*radius,
+                                                (Math.cos(i*Math.PI/180)*Math.sin(l*Math.PI/180))*radius);
+            area.lookAt(new THREE.Vector3(0,0,0));
+            scene.add(area);
+        }
     }
     
     
